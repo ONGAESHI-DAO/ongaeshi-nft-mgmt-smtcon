@@ -1,5 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
-
+const {privateKey} = require("./secrets.json");
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   networks: {
