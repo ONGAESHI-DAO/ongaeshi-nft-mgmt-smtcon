@@ -6,7 +6,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
-
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     mapping(uint256 => bool) public isLended;
@@ -16,37 +15,57 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     uint256 public currentSupply;
     uint256 public supplyLimit;
     address private gtAddress;
-    address private treasury;
+    address private teacher;
 
-    function initialize(string memory _name, string memory _symbol, string memory _collectionMetadataURI, uint256 _price, uint256 _supplyLimit, address _treasury) public initializer {
+    function initialize(
+        string memory _name,
+        string memory _symbol,
+        string memory _collectionMetadataURI,
+        uint256 _price,
+        uint256 _supplyLimit,
+        address _teacher,
+        address _tokenAddr
+    ) public initializer {
         __Ownable_init();
         __ERC721_init(_name, _symbol);
         collectionMetadataURI = _collectionMetadataURI;
         price = _price;
         supplyLimit = _supplyLimit;
-        treasury = _treasury;
-        gtAddress = 0xd88ca08d8eec1E9E09562213Ae83A7853ebB5d28;
+        teacher = _teacher;
+        gtAddress = _tokenAddr;
     }
 
     function mint(uint256 _amount) external {
         uint currSupply = currentSupply;
-        require(currSupply + _amount <= supplyLimit, "Mint request exceeds supply limit");
-        IERC20Upgradeable(gtAddress).safeTransferFrom(msg.sender, address(this), _amount * price);
-        for(uint256 i = 0; i < _amount; i++) {
+        require(
+            currSupply + _amount <= supplyLimit,
+            "Mint request exceeds supply limit"
+        );
+        IERC20Upgradeable(gtAddress).safeTransferFrom(
+            msg.sender,
+            teacher,
+            _amount * price
+        );
+        for (uint256 i = 0; i < _amount; i++) {
             _mint(msg.sender, currSupply + i);
         }
         currentSupply += _amount;
     }
 
-    function mintByAdmin(uint256 _amount, address _recipient) external onlyOwner{
+    function mintByAdmin(
+        uint256 _amount,
+        address _recipient
+    ) external onlyOwner {
         uint currSupply = currentSupply;
-        for(uint256 i = 0; i < _amount; i++) {
+        for (uint256 i = 0; i < _amount; i++) {
             _mint(_recipient, currSupply + i);
         }
         currentSupply += _amount;
     }
 
-    function setCollectionMetadata(string memory _newMetadataURI) external onlyOwner {
+    function setCollectionMetadata(
+        string memory _newMetadataURI
+    ) external onlyOwner {
         collectionMetadataURI = _newMetadataURI;
     }
 
@@ -60,7 +79,10 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     function decreaseSupplyLimit(uint256 _decreaseBy) external onlyOwner {
         require(supplyLimit >= _decreaseBy, "Input greater than supply");
-        require(supplyLimit - _decreaseBy >= currentSupply, "Request would decrease supply limit lower than current Supply");
+        require(
+            supplyLimit - _decreaseBy >= currentSupply,
+            "Request would decrease supply limit lower than current Supply"
+        );
         supplyLimit -= _decreaseBy;
     }
 
