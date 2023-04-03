@@ -29,6 +29,10 @@ contract TalentMatch is OwnableUpgradeable {
         uint64 _sponsorShare,
         uint64 _teacherShare
     ) public initializer {
+        require(
+            _talentShare + _coachShare + _sponsorShare + _teacherShare == 10000,
+            "Shares do not sum to 10000"
+        );
         __Ownable_init();
         gtAddress = _tokenAddr;
         talentShare = _talentShare;
@@ -43,6 +47,10 @@ contract TalentMatch is OwnableUpgradeable {
         uint64 _sponsorShare,
         uint64 _teacherShare
     ) external onlyOwner {
+        require(
+            _talentShare + _coachShare + _sponsorShare + _teacherShare == 10000,
+            "Shares do not sum to 10000"
+        );
         talentShare = _talentShare;
         coachShare = _coachShare;
         sponsorShare = _sponsorShare;
