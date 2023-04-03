@@ -11,6 +11,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     mapping(uint256 => bool) public isLended;
     mapping(uint256 => bool) public needRepair;
     string public collectionMetadataURI;
+    string public baseURI;
     uint256 public price;
     uint256 public currentSupply;
     uint256 public supplyLimit;
@@ -21,6 +22,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         string memory _name,
         string memory _symbol,
         string memory _collectionMetadataURI,
+        string memory _tokenBaseURI,
         uint256 _price,
         uint256 _supplyLimit,
         address _teacher,
@@ -29,6 +31,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         __Ownable_init();
         __ERC721_init(_name, _symbol);
         collectionMetadataURI = _collectionMetadataURI;
+        baseURI = _tokenBaseURI;
         price = _price;
         supplyLimit = _supplyLimit;
         teacher = _teacher;
@@ -108,5 +111,9 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         require(_exists(_tokenId), "Token does not exists");
         require(needRepair[_tokenId], "Token does not need repair");
         needRepair[_tokenId] = false;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
     }
 }

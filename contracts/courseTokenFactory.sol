@@ -22,12 +22,13 @@ contract CourseTokenFactory is OwnableUpgradeable {
         string memory _name,
         string memory _symbol,
         string memory _collectionURI,
+        string memory _tokenBaseURI,
         uint256 _price,
         uint256 _supplyLimit,
         address _teacher
     ) external onlyOwner returns (address) {
         string
-            memory initializerFunction = "initialize(string,string,string,uint256,uint256,address,address)";
+            memory initializerFunction = "initialize(string,string,string,string,uint256,uint256,address,address)";
         BeaconProxy newProxyInstance = new BeaconProxy(
             beaconAddr,
             abi.encodeWithSignature(
@@ -35,6 +36,7 @@ contract CourseTokenFactory is OwnableUpgradeable {
                 _name,
                 _symbol,
                 _collectionURI,
+                _tokenBaseURI,
                 _price,
                 _supplyLimit,
                 _teacher,
