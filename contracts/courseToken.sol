@@ -7,9 +7,12 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 
 contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
+    using StringsUpgradeable for uint256;
 
     mapping(uint256 => bool) public isLended;
     mapping(uint256 => bool) public needRepair;
+    mapping(uint256 => string) public tokenCID;
+
     string public collectionMetadataURI;
     string public baseURI;
     uint256 public price;
@@ -115,5 +118,28 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
+    }
+
+    function setTokenURI(
+        uint256 _tokenId,
+        string memory _cid
+    ) external onlyOwner {
+        tokenCID[_tokenId] = _cid;
+    }
+
+    function tokenURI(
+        uint256 tokenId
+    ) public view override returns (string memory) {
+        _requireMinted(tokenId);
+        string memory tokenCidString = tokenCID[tokenId];
+
+        if (bytes(baseURI).length > 0) {
+            return
+                bytes(tokenCidString).length > 0
+                    ? string(abi.encodePacked(baseURI, tokenCidString))
+                    : string(abi.encodePacked(baseURI, tokenId.toString()));
+        } else {
+            return "";
+        }
     }
 }
