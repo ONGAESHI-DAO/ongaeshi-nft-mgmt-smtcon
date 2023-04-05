@@ -1,6 +1,10 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('@openzeppelin/hardhat-upgrades');
-const {privateKey} = require("./secrets.json");
+const { privateKey, localPrivateKey, alchemyPolygonNode} = require('./secrets.json');
+
+let RPCNode = alchemyPolygonNode;
+let blockNum = 41056133;
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   networks: {
@@ -8,12 +12,12 @@ module.exports = {
       chainId: 31337,
       url: "http://127.0.0.1:8545",
     },
-    // hardhat: {
-    //   forking: {
-    //     url: RPCNode,
-    //     blockNumber: blockNum
-    //   }
-    // },
+    hardhat: {
+      forking: {
+        url: RPCNode,
+        blockNumber: blockNum
+      }
+    },
     testnet: {
       url: "https://rpc-mumbai.maticvigil.com/",
       chainId: 80001,
