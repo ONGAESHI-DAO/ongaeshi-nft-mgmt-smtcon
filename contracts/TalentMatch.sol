@@ -21,6 +21,15 @@ contract TalentMatch is OwnableUpgradeable {
     uint64 teacherShare;
 
     mapping(address => MatchData) public matchRegistry;
+    mapping(address => bool) public admins;
+
+    modifier onlyAdmin {
+        require(
+            admins[msg.sender],
+            "admin: wut?"
+        );
+        _;
+    }
 
     function initialize(
         address _tokenAddr,
@@ -39,6 +48,7 @@ contract TalentMatch is OwnableUpgradeable {
         coachShare = _coachShare;
         sponsorShare = _sponsorShare;
         teacherShare = _teacherShare;
+        admins[msg.sender] = true;
     }
 
     function updateShareScheme(
@@ -46,7 +56,7 @@ contract TalentMatch is OwnableUpgradeable {
         uint64 _coachShare,
         uint64 _sponsorShare,
         uint64 _teacherShare
-    ) external onlyOwner {
+    ) external onlyAdmin {
         require(
             _talentShare + _coachShare + _sponsorShare + _teacherShare == 10000,
             "Shares do not sum to 10000"
@@ -64,7 +74,7 @@ contract TalentMatch is OwnableUpgradeable {
         address _teacher,
         address _nftAddress,
         uint256 _tokenId
-    ) external onlyOwner {
+    ) external onlyAdmin {
         require(
             matchRegistry[_talent].nftAddress == address(0),
             "match data already exists"
@@ -86,7 +96,7 @@ contract TalentMatch is OwnableUpgradeable {
         address _teacher,
         address _nftAddress,
         uint256 _tokenId
-    ) external onlyOwner {
+    ) external onlyAdmin {
         require(
             matchRegistry[_talent].nftAddress != address(0),
             "match data does not exists"
@@ -101,14 +111,14 @@ contract TalentMatch is OwnableUpgradeable {
         matchRegistry[_talent] = newMatch;
     }
 
-    function deleteTalentMatch(address _talent) external onlyOwner {
+    function deleteTalentMatch(address _talent) external onlyAdmin {
         delete matchRegistry[_talent];
     }
 
     function confirmTalentMatch(
         address _talent,
         uint256 _amount
-    ) external onlyOwner {
+    ) external onlyAdmin {
         MatchData memory matchData = matchRegistry[_talent];
         require(matchData.nftAddress != address(0), "match does not exist");
         delete matchRegistry[_talent];
@@ -133,5 +143,10 @@ contract TalentMatch is OwnableUpgradeable {
             matchData.teacher,
             (_amount * teacherShare) / 10000
         );
+    }
+
+    // Support multiple wallets or address as admin
+    function setAdmin(address _address, bool _allow) external onlyOwner {
+        admins[_address] = _allow;
     }
 }

@@ -1,6 +1,10 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('@openzeppelin/hardhat-upgrades');
-const {privateKey} = require("./secrets.json");
+const { privateKey, alchemyPolygonNode} = require('./secrets.json');
+
+let RPCNode = alchemyPolygonNode;
+let blockNum = 41056133;
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   networks: {
