@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "./Interface/ICourseToken";
 
 contract TalentMatch is OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -23,11 +24,8 @@ contract TalentMatch is OwnableUpgradeable {
     mapping(address => MatchData) public matchRegistry;
     mapping(address => bool) public admins;
 
-    modifier onlyAdmin {
-        require(
-            admins[msg.sender],
-            "admin: wut?"
-        );
+    modifier onlyAdmin() {
+        require(admins[msg.sender], "admin: wut?");
         _;
     }
 
@@ -123,26 +121,34 @@ contract TalentMatch is OwnableUpgradeable {
         require(matchData.nftAddress != address(0), "match does not exist");
         delete matchRegistry[_talent];
 
-        IERC20Upgradeable(gtAddress).transferFrom(
+        IERC20Upgradeable(gtAddress).safeTransferFrom(
             msg.sender,
             _talent,
             (_amount * talentShare) / 10000
         );
-        IERC20Upgradeable(gtAddress).transferFrom(
+        IERC20Upgradeable(gtAddress).safeTransferFrom(
             msg.sender,
             matchData.coach,
             (_amount * coachShare) / 10000
         );
-        IERC20Upgradeable(gtAddress).transferFrom(
+        IERC20Upgradeable(gtAddress).safeTransferFrom(
             msg.sender,
             matchData.sponsor,
             (_amount * sponsorShare) / 10000
         );
-        IERC20Upgradeable(gtAddress).transferFrom(
+
+        uint256 teacherAmount = (_amount * teacherShare) / 10000;
+        
+        IERC20Upgradeable(gtAddress).safeTransferFrom(
             msg.sender,
-            matchData.teacher,
-            (_amount * teacherShare) / 10000
+            address(this),
+            teacherAmount
         );
+        IERC20Upgradeable(gtAddress).safeIncreaseAllowance(
+            matchData.nftAddress,
+            teacherAmount
+        );
+        ICourseToken(matchData.nftAddress).payTeachers(teacherAmount);
     }
 
     // Support multiple wallets or address as admin

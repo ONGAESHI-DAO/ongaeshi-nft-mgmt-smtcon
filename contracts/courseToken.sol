@@ -20,17 +20,19 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     uint256 public supplyLimit;
     address private gtAddress;
     address private teacher;
+    address[] public teachers;
+    uint64[] public teacherShares;
 
     function initialize(
-        string memory _name,
-        string memory _symbol,
-        string memory _collectionMetadataURI,
-        string memory _tokenBaseURI,
+        string calldata _name,
+        string calldata _symbol,
+        string calldata _collectionMetadataURI,
+        string calldata _tokenBaseURI,
         uint256 _price,
         uint256 _supplyLimit,
         address _teacher,
         address _tokenAddr
-    ) public initializer {
+    ) external initializer {
         __Ownable_init();
         __ERC721_init(_name, _symbol);
         collectionMetadataURI = _collectionMetadataURI;
@@ -41,17 +43,28 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         gtAddress = _tokenAddr;
     }
 
+    function addTeacherShares(
+        address[] calldata _teachers,
+        uint64[] calldata _shares
+    ) external onlyOwner {
+        require(teachers.length == 0, "Teacher shares already initialized");
+        require(_teachers.length == _shares.length, "Input lengths mismatch");
+        uint64 sum;
+        for (uint i = 0; i < _teachers.length; i++) {
+            teachers.push(_teachers[i]);
+            teacherShares.push(_shares[i]);
+            sum += _shares[i];
+        }
+        require(sum == 10000, "Shares sum does not equal 10000");
+    }
+
     function mint(uint256 _amount) external {
         uint currSupply = currentSupply;
         require(
             currSupply + _amount <= supplyLimit,
             "Mint request exceeds supply limit"
         );
-        IERC20Upgradeable(gtAddress).safeTransferFrom(
-            msg.sender,
-            teacher,
-            _amount * price
-        );
+        payTeachers(_amount * price);
         for (uint256 i = 0; i < _amount; i++) {
             _mint(msg.sender, currSupply + i);
         }
@@ -70,7 +83,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     }
 
     function setCollectionMetadata(
-        string memory _newMetadataURI
+        string calldata _newMetadataURI
     ) external onlyOwner {
         collectionMetadataURI = _newMetadataURI;
     }
@@ -140,6 +153,18 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
                     : string(abi.encodePacked(baseURI, tokenId.toString()));
         } else {
             return "";
+        }
+    }
+
+    function payTeachers(uint256 amount) public {
+        require(teachers.length > 0, "Teachers not initialized");
+        for (uint i = 0; i < teachers.length; i++) {
+            uint paymentAmount = (amount * teacherShares[i]) / 10000;
+            IERC20Upgradeable(gtAddress).safeTransferFrom(
+                msg.sender,
+                teachers[i],
+                paymentAmount
+            );
         }
     }
 }

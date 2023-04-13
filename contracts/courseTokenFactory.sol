@@ -12,17 +12,17 @@ contract CourseTokenFactory is OwnableUpgradeable {
     function initialize(
         address _beaconAddress,
         address _tokenAddr
-    ) public initializer {
+    ) external initializer {
         beaconAddr = _beaconAddress;
         gtAddress = _tokenAddr;
         __Ownable_init();
     }
 
     function deployCourseToken(
-        string memory _name,
-        string memory _symbol,
-        string memory _collectionURI,
-        string memory _tokenBaseURI,
+        string calldata _name,
+        string calldata _symbol,
+        string calldata _collectionURI,
+        string calldata _tokenBaseURI,
         uint256 _price,
         uint256 _supplyLimit,
         address _teacher
