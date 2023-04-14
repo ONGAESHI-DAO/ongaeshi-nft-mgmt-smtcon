@@ -25,5 +25,14 @@ module.exports = {
       accounts: [privateKey]
     }
   },
-  solidity: "0.8.17",
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      viaIR: true,
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    },
+  }
 };

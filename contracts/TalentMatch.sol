@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "./Interface/ICourseToken";
+import "./Interface/ICourseToken.sol";
 
 contract TalentMatch is OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
