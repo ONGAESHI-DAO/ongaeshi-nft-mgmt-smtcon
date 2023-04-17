@@ -13,7 +13,6 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     mapping(uint256 => bool) public needRepair;
     mapping(uint256 => string) public tokenCID;
 
-    string public collectionMetadataURI;
     string public baseURI;
     uint256 public price;
     uint256 public currentSupply;
@@ -26,7 +25,6 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     function initialize(
         string calldata _name,
         string calldata _symbol,
-        string calldata _collectionMetadataURI,
         string calldata _tokenBaseURI,
         uint256 _price,
         uint256 _supplyLimit,
@@ -35,7 +33,6 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     ) external initializer {
         __Ownable_init();
         __ERC721_init(_name, _symbol);
-        collectionMetadataURI = _collectionMetadataURI;
         baseURI = _tokenBaseURI;
         price = _price;
         supplyLimit = _supplyLimit;
@@ -80,12 +77,6 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             _mint(_recipient, currSupply + i);
         }
         currentSupply += _amount;
-    }
-
-    function setCollectionMetadata(
-        string calldata _newMetadataURI
-    ) external onlyOwner {
-        collectionMetadataURI = _newMetadataURI;
     }
 
     function setPrice(uint256 _newPrice) external onlyOwner {
@@ -135,9 +126,19 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     function setTokenURI(
         uint256 _tokenId,
-        string memory _cid
+        string calldata _cid
     ) external onlyOwner {
         tokenCID[_tokenId] = _cid;
+    }
+
+    function setTokenURIs(
+        uint256[] calldata _tokenId,
+        string[] calldata _cid
+    ) external onlyOwner {
+        require(_tokenId.length == _cid.length, "Input lengths mismatch");
+        for(uint i = 0; i < _tokenId.length; i++) {
+            tokenCID[_tokenId[i]] = _cid[i];
+        }
     }
 
     function tokenURI(
