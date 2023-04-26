@@ -33,7 +33,8 @@ contract CourseTokenFactory is OwnableUpgradeable {
         string calldata _tokenBaseURI,
         uint256 _price,
         uint256 _supplyLimit,
-        address _teacher
+        address _teacher,
+        ICourseToken.TeacherShare[] calldata _teacherShares
     ) external onlyAdmin {
         string
             memory initializerFunction = "initialize(string,string,string,uint256,uint256,address,address)";
@@ -53,6 +54,7 @@ contract CourseTokenFactory is OwnableUpgradeable {
         address newAddr = address(newProxyInstance);
         deployedAddresses.push(newAddr);
         ICourseToken(newAddr).setAdmin(msg.sender, true);
+        ICourseToken(newAddr).addTeacherShares(_teacherShares);
         OwnableUpgradeable(newAddr).transferOwnership(msg.sender);
         emit CourseDeployed(newAddr);
     }
@@ -65,5 +67,4 @@ contract CourseTokenFactory is OwnableUpgradeable {
     function setAdmin(address _address, bool _allow) external onlyOwner {
         admins[_address] = _allow;
     }
-
 }

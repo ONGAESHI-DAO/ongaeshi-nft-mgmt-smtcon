@@ -9,6 +9,10 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using StringsUpgradeable for uint256;
 
+    struct TeacherShare {
+        address teacher;
+        uint256 shares;
+    }
     mapping(uint256 => bool) public isLended;
     mapping(uint256 => bool) public needRepair;
     mapping(uint256 => string) public tokenCID;
@@ -20,14 +24,13 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     uint256 public supplyLimit;
     address private gtAddress;
     address private teacher;
-    address[] public teachers;
-    uint64[] public teacherShares;
+    TeacherShare[] private teacherShares;
 
     event TokenMint(address indexed destAddress, uint tokenId, uint price);
     event PriceUpdated(uint oldPrice, uint newPrice);
     event SupplyLimitUpdated(uint oldSupplyLimit, uint newSupplyLimit);
-    event TeacherPaid(address[] teachers, uint totalamount);
-    
+    event TeacherPaid(TeacherShare[] teachers, uint totalamount);
+
     modifier onlyAdmin() {
         require(admins[msg.sender], "admin: wut?");
         _;
@@ -53,16 +56,16 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     }
 
     function addTeacherShares(
-        address[] calldata _teachers,
-        uint64[] calldata _shares
-    ) external onlyAdmin {
-        require(teachers.length == 0, "Teacher shares already initialized");
-        require(_teachers.length == _shares.length, "Input lengths mismatch");
-        uint64 sum;
-        for (uint i = 0; i < _teachers.length; i++) {
-            teachers.push(_teachers[i]);
-            teacherShares.push(_shares[i]);
-            sum += _shares[i];
+        TeacherShare[] calldata _teacherShares
+    ) external onlyOwner {
+        require(
+            teacherShares.length == 0,
+            "Already initialized Teacher Shares"
+        );
+        uint256 sum;
+        for (uint i = 0; i < _teacherShares.length; i++) {
+            teacherShares.push(_teacherShares[i]);
+            sum += _teacherShares[i].shares;
         }
         require(sum == 10000, "Shares sum does not equal 10000");
     }
@@ -148,7 +151,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         string[] calldata _cid
     ) external onlyAdmin {
         require(_tokenId.length == _cid.length, "Input lengths mismatch");
-        for(uint i = 0; i < _tokenId.length; i++) {
+        for (uint i = 0; i < _tokenId.length; i++) {
             tokenCID[_tokenId[i]] = _cid[i];
         }
     }
@@ -170,16 +173,16 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     }
 
     function payTeachers(uint256 amount) public {
-        require(teachers.length > 0, "Teachers not initialized");
-        for (uint i = 0; i < teachers.length; i++) {
-            uint paymentAmount = (amount * teacherShares[i]) / 10000;
+        require(teacherShares.length > 0, "Teachers not initialized");
+        for (uint i = 0; i < teacherShares.length; i++) {
+            uint paymentAmount = (amount * teacherShares[i].shares) / 10000;
             IERC20Upgradeable(gtAddress).safeTransferFrom(
                 msg.sender,
-                teachers[i],
+                teacherShares[i].teacher,
                 paymentAmount
             );
         }
-        emit TeacherPaid(teachers, amount);
+        emit TeacherPaid(teacherShares, amount);
     }
 
     // Support multiple wallets or address as admin
