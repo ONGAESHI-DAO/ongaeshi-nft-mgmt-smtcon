@@ -29,6 +29,11 @@ contract TalentMatch is OwnableUpgradeable {
         _;
     }
 
+    event TalentMatchAdded(MatchData newMatch, address indexed talentAddr);
+    event TalentMatchConfirmed(MatchData newMatch, address indexed talentAddr, uint amount);
+    event TalentMatchUpdated(MatchData newMatch, address indexed talentAddr);
+    event TalentMatchDeleted(address indexed talentAddr);
+
     function initialize(
         address _tokenAddr,
         uint64 _talentShare,
@@ -85,6 +90,8 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.tokenId = _tokenId;
 
         matchRegistry[_talent] = newMatch;
+        emit TalentMatchAdded(newMatch, _talent);
+    
     }
 
     function updateTalentMatch(
@@ -107,10 +114,13 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.tokenId = _tokenId;
 
         matchRegistry[_talent] = newMatch;
+        emit TalentMatchUpdated(newMatch, _talent);
+
     }
 
     function deleteTalentMatch(address _talent) external onlyAdmin {
         delete matchRegistry[_talent];
+        emit TalentMatchDeleted(_talent);
     }
 
     function confirmTalentMatch(
@@ -149,6 +159,7 @@ contract TalentMatch is OwnableUpgradeable {
             teacherAmount
         );
         ICourseToken(matchData.nftAddress).payTeachers(teacherAmount);
+        emit TalentMatchConfirmed(matchData, _talent, _amount);
     }
 
     // Support multiple wallets or address as admin

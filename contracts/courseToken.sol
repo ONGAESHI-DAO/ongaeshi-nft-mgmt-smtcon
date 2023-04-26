@@ -12,6 +12,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     mapping(uint256 => bool) public isLended;
     mapping(uint256 => bool) public needRepair;
     mapping(uint256 => string) public tokenCID;
+    mapping(address => bool) public admins;
 
     string public baseURI;
     uint256 public price;
@@ -21,6 +22,16 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     address private teacher;
     address[] public teachers;
     uint64[] public teacherShares;
+
+    event TokenMint(address indexed destAddress, uint tokenId, uint price);
+    event PriceUpdated(uint oldPrice, uint newPrice);
+    event SupplyLimitUpdated(uint oldSupplyLimit, uint newSupplyLimit);
+    event TeacherPaid(address[] teachers, uint totalamount);
+    
+    modifier onlyAdmin() {
+        require(admins[msg.sender], "admin: wut?");
+        _;
+    }
 
     function initialize(
         string calldata _name,
@@ -38,12 +49,13 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         supplyLimit = _supplyLimit;
         teacher = _teacher;
         gtAddress = _tokenAddr;
+        admins[msg.sender] = true;
     }
 
     function addTeacherShares(
         address[] calldata _teachers,
         uint64[] calldata _shares
-    ) external onlyOwner {
+    ) external onlyAdmin {
         require(teachers.length == 0, "Teacher shares already initialized");
         require(_teachers.length == _shares.length, "Input lengths mismatch");
         uint64 sum;
@@ -71,7 +83,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     function mintByAdmin(
         uint256 _amount,
         address _recipient
-    ) external onlyOwner {
+    ) external onlyAdmin {
         uint currSupply = currentSupply;
         for (uint256 i = 0; i < _amount; i++) {
             _mint(_recipient, currSupply + i);
@@ -79,15 +91,15 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         currentSupply += _amount;
     }
 
-    function setPrice(uint256 _newPrice) external onlyOwner {
+    function setPrice(uint256 _newPrice) external onlyAdmin {
         price = _newPrice;
     }
 
-    function increaseSupplyLimit(uint256 _increaseBy) external onlyOwner {
+    function increaseSupplyLimit(uint256 _increaseBy) external onlyAdmin {
         supplyLimit += _increaseBy;
     }
 
-    function decreaseSupplyLimit(uint256 _decreaseBy) external onlyOwner {
+    function decreaseSupplyLimit(uint256 _decreaseBy) external onlyAdmin {
         require(supplyLimit >= _decreaseBy, "Input greater than supply");
         require(
             supplyLimit - _decreaseBy >= currentSupply,
@@ -96,25 +108,25 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         supplyLimit -= _decreaseBy;
     }
 
-    function lendToken(uint256 _tokenId) external onlyOwner {
+    function lendToken(uint256 _tokenId) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
         require(!isLended[_tokenId], "Token already lended");
         isLended[_tokenId] = true;
     }
 
-    function returnToken(uint256 _tokenId) external onlyOwner {
+    function returnToken(uint256 _tokenId) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
         require(isLended[_tokenId], "Token not on loan");
         isLended[_tokenId] = false;
     }
 
-    function breakToken(uint256 _tokenId) external onlyOwner {
+    function breakToken(uint256 _tokenId) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
         require(!needRepair[_tokenId], "Token already needs repair");
         needRepair[_tokenId] = true;
     }
 
-    function repairToken(uint256 _tokenId) external onlyOwner {
+    function repairToken(uint256 _tokenId) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
         require(needRepair[_tokenId], "Token does not need repair");
         needRepair[_tokenId] = false;
@@ -127,14 +139,14 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     function setTokenURI(
         uint256 _tokenId,
         string calldata _cid
-    ) external onlyOwner {
+    ) external onlyAdmin {
         tokenCID[_tokenId] = _cid;
     }
 
     function setTokenURIs(
         uint256[] calldata _tokenId,
         string[] calldata _cid
-    ) external onlyOwner {
+    ) external onlyAdmin {
         require(_tokenId.length == _cid.length, "Input lengths mismatch");
         for(uint i = 0; i < _tokenId.length; i++) {
             tokenCID[_tokenId[i]] = _cid[i];
@@ -167,5 +179,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
                 paymentAmount
             );
         }
+        emit TeacherPaid(teachers, amount);
+    }
+
+    // Support multiple wallets or address as admin
+    function setAdmin(address _address, bool _allow) external onlyOwner {
+        admins[_address] = _allow;
     }
 }
