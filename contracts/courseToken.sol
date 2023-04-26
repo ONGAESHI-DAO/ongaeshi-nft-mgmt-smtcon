@@ -30,6 +30,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     event PriceUpdated(uint oldPrice, uint newPrice);
     event SupplyLimitUpdated(uint oldSupplyLimit, uint newSupplyLimit);
     event TeacherPaid(TeacherShare[] teachers, uint totalamount);
+    event TeacherAdded(TeacherShare[] teachers);
 
     modifier onlyAdmin() {
         require(admins[msg.sender], "admin: wut?");
@@ -68,6 +69,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             sum += _teacherShares[i].shares;
         }
         require(sum == 10000, "Shares sum does not equal 10000");
+        emit TeacherAdded(_teacherShares);
     }
 
     function mint(uint256 _amount) external {
@@ -79,6 +81,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         payTeachers(_amount * price);
         for (uint256 i = 0; i < _amount; i++) {
             _mint(msg.sender, currSupply + i);
+            emit TokenMint(msg.sender, currSupply + i, price);
         }
         currentSupply += _amount;
     }
@@ -90,16 +93,20 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         uint currSupply = currentSupply;
         for (uint256 i = 0; i < _amount; i++) {
             _mint(_recipient, currSupply + i);
+            emit TokenMint(_recipient, currSupply + i, price);
         }
         currentSupply += _amount;
     }
 
     function setPrice(uint256 _newPrice) external onlyAdmin {
+        emit PriceUpdated(price, _newPrice);
         price = _newPrice;
     }
 
     function increaseSupplyLimit(uint256 _increaseBy) external onlyAdmin {
-        supplyLimit += _increaseBy;
+        uint newSupply = supplyLimit + _increaseBy;
+        emit SupplyLimitUpdated(supplyLimit, newSupply);
+        supplyLimit = newSupply;
     }
 
     function decreaseSupplyLimit(uint256 _decreaseBy) external onlyAdmin {
@@ -108,7 +115,9 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             supplyLimit - _decreaseBy >= currentSupply,
             "Request would decrease supply limit lower than current Supply"
         );
-        supplyLimit -= _decreaseBy;
+        uint newSupply = supplyLimit - _decreaseBy;
+        emit SupplyLimitUpdated(supplyLimit, newSupply);
+        supplyLimit = newSupply;
     }
 
     function lendToken(uint256 _tokenId) external onlyAdmin {
