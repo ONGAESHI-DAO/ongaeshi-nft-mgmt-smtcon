@@ -49,6 +49,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         supplyLimit = _supplyLimit;
         teacher = _teacher;
         gtAddress = _tokenAddr;
+        admins[msg.sender] = true;
     }
 
     function addTeacherShares(

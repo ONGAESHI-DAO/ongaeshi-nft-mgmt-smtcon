@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import "./Interface/ICourseToken.sol";
 
 contract CourseTokenFactory is OwnableUpgradeable {
     address[] public deployedAddresses;
@@ -51,6 +52,7 @@ contract CourseTokenFactory is OwnableUpgradeable {
         );
         address newAddr = address(newProxyInstance);
         deployedAddresses.push(newAddr);
+        ICourseToken(newAddr).setAdmin(msg.sender, true);
         OwnableUpgradeable(newAddr).transferOwnership(msg.sender);
         emit CourseDeployed(newAddr);
     }
