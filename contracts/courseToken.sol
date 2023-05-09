@@ -4,15 +4,14 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "./Interface/ICourseTokenEvent.sol";
+import "./OGSLib.sol";
+
 
 contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using StringsUpgradeable for uint256;
 
-    struct TeacherShare {
-        address teacher;
-        uint256 shares;
-    }
     mapping(uint256 => bool) public isLended;
     mapping(uint256 => bool) public needRepair;
     mapping(uint256 => string) public tokenCID;
@@ -24,13 +23,8 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     uint256 public supplyLimit;
     address private gtAddress;
     address private teacher;
-    TeacherShare[] private teacherShares;
-
-    event TokenMint(address indexed destAddress, uint tokenId, uint price);
-    event PriceUpdated(uint oldPrice, uint newPrice);
-    event SupplyLimitUpdated(uint oldSupplyLimit, uint newSupplyLimit);
-    event TeacherPaid(TeacherShare[] teachers, uint totalamount);
-    event TeacherAdded(TeacherShare[] teachers);
+    OGSLib.TeacherShare[] private teacherShares;
+    ICourseTokenEvent public xEmitEvent;
 
     modifier onlyAdmin() {
         require(admins[msg.sender], "admin: wut?");
@@ -44,7 +38,8 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         uint256 _price,
         uint256 _supplyLimit,
         address _teacher,
-        address _tokenAddr
+        address _tokenAddr,
+        address _emitEventAddr
     ) external initializer {
         __Ownable_init();
         __ERC721_init(_name, _symbol);
@@ -53,11 +48,12 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         supplyLimit = _supplyLimit;
         teacher = _teacher;
         gtAddress = _tokenAddr;
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
         admins[msg.sender] = true;
     }
 
     function addTeacherShares(
-        TeacherShare[] calldata _teacherShares
+        OGSLib.TeacherShare[] calldata _teacherShares
     ) external onlyOwner {
         require(
             teacherShares.length == 0,
@@ -69,7 +65,8 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             sum += _teacherShares[i].shares;
         }
         require(sum == 10000, "Shares sum does not equal 10000");
-        emit TeacherAdded(_teacherShares);
+        xEmitEvent.TeacherAddedEvent(address(this), _teacherShares);
+
     }
 
     function mint(uint256 _amount) external {
@@ -81,7 +78,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         payTeachers(_amount * price);
         for (uint256 i = 0; i < _amount; i++) {
             _mint(msg.sender, currSupply + i);
-            emit TokenMint(msg.sender, currSupply + i, price);
+            xEmitEvent.TokenMintEvent(address(this), msg.sender, currSupply + i, price);
         }
         currentSupply += _amount;
     }
@@ -93,19 +90,19 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         uint currSupply = currentSupply;
         for (uint256 i = 0; i < _amount; i++) {
             _mint(_recipient, currSupply + i);
-            emit TokenMint(_recipient, currSupply + i, price);
+            xEmitEvent.TokenMintEvent(address(this), _recipient, currSupply + i, price);
         }
         currentSupply += _amount;
     }
 
     function setPrice(uint256 _newPrice) external onlyAdmin {
-        emit PriceUpdated(price, _newPrice);
+        xEmitEvent.PriceUpdatedEvent(address(this), price, _newPrice);
         price = _newPrice;
     }
 
     function increaseSupplyLimit(uint256 _increaseBy) external onlyAdmin {
         uint newSupply = supplyLimit + _increaseBy;
-        emit SupplyLimitUpdated(supplyLimit, newSupply);
+        xEmitEvent.SupplyLimitUpdatedEvent(address(this), supplyLimit, newSupply);
         supplyLimit = newSupply;
     }
 
@@ -116,7 +113,8 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             "Request would decrease supply limit lower than current Supply"
         );
         uint newSupply = supplyLimit - _decreaseBy;
-        emit SupplyLimitUpdated(supplyLimit, newSupply);
+        xEmitEvent.SupplyLimitUpdatedEvent(address(this), supplyLimit, newSupply);
+
         supplyLimit = newSupply;
     }
 
@@ -191,7 +189,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
                 paymentAmount
             );
         }
-        emit TeacherPaid(teacherShares, amount);
+        xEmitEvent.TeacherPaidEvent(address(this), teacherShares, amount);
     }
 
     // Support multiple wallets or address as admin
