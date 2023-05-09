@@ -4,42 +4,34 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./Interface/ICourseToken.sol";
+import "./Interface/ICourseTokenEvent.sol";
+import "./OGSLib.sol";
 
 contract TalentMatch is OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    struct MatchData {
-        address coach;
-        address sponsor;
-        address teacher;
-        address nftAddress;
-        uint256 tokenId;
-    }
     address gtAddress;
     uint64 talentShare;
     uint64 coachShare;
     uint64 sponsorShare;
     uint64 teacherShare;
 
-    mapping(address => MatchData) public matchRegistry;
+    mapping(address => OGSLib.MatchData) public matchRegistry;
     mapping(address => bool) public admins;
+    ICourseTokenEvent public xEmitEvent;
 
     modifier onlyAdmin() {
         require(admins[msg.sender], "admin: wut?");
         _;
     }
 
-    event TalentMatchAdded(MatchData newMatch, address indexed talentAddr);
-    event TalentMatchConfirmed(MatchData newMatch, address indexed talentAddr, uint amount);
-    event TalentMatchUpdated(MatchData newMatch, address indexed talentAddr);
-    event TalentMatchDeleted(address indexed talentAddr);
-
     function initialize(
         address _tokenAddr,
         uint64 _talentShare,
         uint64 _coachShare,
         uint64 _sponsorShare,
-        uint64 _teacherShare
+        uint64 _teacherShare,
+        address _emitEventAddr
     ) public initializer {
         require(
             _talentShare + _coachShare + _sponsorShare + _teacherShare == 10000,
@@ -52,6 +44,7 @@ contract TalentMatch is OwnableUpgradeable {
         sponsorShare = _sponsorShare;
         teacherShare = _teacherShare;
         admins[msg.sender] = true;
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);        
     }
 
     function updateShareScheme(
@@ -68,6 +61,7 @@ contract TalentMatch is OwnableUpgradeable {
         coachShare = _coachShare;
         sponsorShare = _sponsorShare;
         teacherShare = _teacherShare;
+        xEmitEvent.ShareSchemeUpdatedEvent(_talentShare, _coachShare, _sponsorShare, _teacherShare);
     }
 
     function addTalentMatch(
@@ -82,7 +76,7 @@ contract TalentMatch is OwnableUpgradeable {
             matchRegistry[_talent].nftAddress == address(0),
             "match data already exists"
         );
-        MatchData memory newMatch;
+        OGSLib.MatchData memory newMatch;
         newMatch.coach = _coach;
         newMatch.sponsor = _sponsor;
         newMatch.teacher = _teacher;
@@ -90,8 +84,7 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.tokenId = _tokenId;
 
         matchRegistry[_talent] = newMatch;
-        emit TalentMatchAdded(newMatch, _talent);
-    
+        xEmitEvent.TalentMatchAddedEvent(newMatch, _talent);    
     }
 
     function updateTalentMatch(
@@ -106,7 +99,7 @@ contract TalentMatch is OwnableUpgradeable {
             matchRegistry[_talent].nftAddress != address(0),
             "match data does not exists"
         );
-        MatchData memory newMatch;
+        OGSLib.MatchData memory newMatch;
         newMatch.coach = _coach;
         newMatch.sponsor = _sponsor;
         newMatch.teacher = _teacher;
@@ -114,20 +107,20 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.tokenId = _tokenId;
 
         matchRegistry[_talent] = newMatch;
-        emit TalentMatchUpdated(newMatch, _talent);
-
+        xEmitEvent.TalentMatchUpdatedEvent(newMatch, _talent);
     }
 
     function deleteTalentMatch(address _talent) external onlyAdmin {
+        OGSLib.MatchData memory _match = matchRegistry[_talent];
+        xEmitEvent.TalentMatchDeletedEvent(_match, _talent);
         delete matchRegistry[_talent];
-        emit TalentMatchDeleted(_talent);
     }
 
     function confirmTalentMatch(
         address _talent,
         uint256 _amount
     ) external onlyAdmin {
-        MatchData memory matchData = matchRegistry[_talent];
+        OGSLib.MatchData memory matchData = matchRegistry[_talent];
         require(matchData.nftAddress != address(0), "match does not exist");
         delete matchRegistry[_talent];
 
@@ -159,7 +152,7 @@ contract TalentMatch is OwnableUpgradeable {
             teacherAmount
         );
         ICourseToken(matchData.nftAddress).payTeachers(teacherAmount);
-        emit TalentMatchConfirmed(matchData, _talent, _amount);
+        xEmitEvent.TalentMatchConfirmedEvent(matchData, _talent, _amount);
     }
 
     // Support multiple wallets or address as admin

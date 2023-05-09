@@ -4,25 +4,28 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "./Interface/ICourseToken.sol";
+import "./Interface/ICourseTokenEvent.sol";
 
 contract CourseTokenFactory is OwnableUpgradeable {
     address[] public deployedAddresses;
     address public beaconAddr;
     address public gtAddress;
     mapping(address => bool) public admins;
+    ICourseTokenEvent public xEmitEvent;
 
     modifier onlyAdmin() {
         require(admins[msg.sender], "admin: wut?");
         _;
     }
-    event CourseDeployed(address indexed courseAddress);
 
     function initialize(
         address _beaconAddress,
-        address _tokenAddr
+        address _tokenAddr,
+        address _emitEventAddr
     ) external initializer {
         beaconAddr = _beaconAddress;
         gtAddress = _tokenAddr;
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
         admins[msg.sender] = true;
         __Ownable_init();
     }
@@ -37,7 +40,7 @@ contract CourseTokenFactory is OwnableUpgradeable {
         ICourseToken.TeacherShare[] calldata _teacherShares
     ) external onlyAdmin {
         string
-            memory initializerFunction = "initialize(string,string,string,uint256,uint256,address,address)";
+            memory initializerFunction = "initialize(string,string,string,uint256,uint256,address,address,address)";
         BeaconProxy newProxyInstance = new BeaconProxy(
             beaconAddr,
             abi.encodeWithSignature(
@@ -48,15 +51,17 @@ contract CourseTokenFactory is OwnableUpgradeable {
                 _price,
                 _supplyLimit,
                 _teacher,
-                gtAddress
+                gtAddress,
+                address(xEmitEvent)
             )
         );
         address newAddr = address(newProxyInstance);
         deployedAddresses.push(newAddr);
+        xEmitEvent.setExecutor(newAddr, true);
         ICourseToken(newAddr).setAdmin(msg.sender, true);
         ICourseToken(newAddr).addTeacherShares(_teacherShares);
         OwnableUpgradeable(newAddr).transferOwnership(msg.sender);
-        emit CourseDeployed(newAddr);
+        xEmitEvent.CourseDeployedEvent(newAddr, msg.sender);
     }
 
     function getAllDeployedTokens() external view returns (address[] memory) {
