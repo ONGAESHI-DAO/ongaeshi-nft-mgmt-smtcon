@@ -192,6 +192,10 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         xEmitEvent.TeacherPaidEvent(address(this), teacherShares, amount);
     }
 
+    function getSubTeachers() public view returns (OGSLib.TeacherShare[] memory) {
+        return teacherShares;
+    }
+
     // Support multiple wallets or address as admin
     function setAdmin(address _address, bool _allow) external onlyOwner {
         admins[_address] = _allow;
