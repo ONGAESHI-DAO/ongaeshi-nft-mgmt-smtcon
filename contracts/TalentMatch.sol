@@ -10,11 +10,11 @@ import "./OGSLib.sol";
 contract TalentMatch is OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    address gtAddress;
-    uint64 talentShare;
-    uint64 coachShare;
-    uint64 sponsorShare;
-    uint64 teacherShare;
+    address public gtAddress;
+    uint64 public talentShare;
+    uint64 public coachShare;
+    uint64 public sponsorShare;
+    uint64 public teacherShare;
 
     mapping(address => OGSLib.MatchData) public matchRegistry;
     mapping(address => bool) public admins;
