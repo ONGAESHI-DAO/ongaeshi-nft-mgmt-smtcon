@@ -75,7 +75,7 @@ contract CourseTokenFactory is OwnableUpgradeable {
         require(_beaconAddress != address(0), "_beaconAddress is zero");
         beaconAddr = _beaconAddress;
     }
-    
+
     function setEmitEvent(address _emitEventAddr) external onlyOwner {
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         xEmitEvent = ICourseTokenEvent(_emitEventAddr);

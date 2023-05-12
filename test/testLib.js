@@ -39,7 +39,7 @@ async function deployTestEnvFixture() {
     console.log(accounts[0].address);
     await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), 100, accounts[0].address, defaultTeacherShares);
     const courseNFT = await courseTokenDeployer.attach(await courseFactory.deployedAddresses(0));
-    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares};
+    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares };
 }
 
 module.exports = {

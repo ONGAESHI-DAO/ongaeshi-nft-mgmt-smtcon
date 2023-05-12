@@ -7,7 +7,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "./Interface/ICourseTokenEvent.sol";
 import "./OGSLib.sol";
 
-
 contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using StringsUpgradeable for uint256;
@@ -70,7 +69,6 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         }
         require(sum == 10000, "Shares sum does not equal 10000");
         xEmitEvent.TeacherAddedEvent(address(this), _teacherShares);
-
     }
 
     function mint(uint256 _amount) external {
@@ -82,7 +80,12 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         payTeachers(_amount * price);
         for (uint256 i = 0; i < _amount; i++) {
             _mint(msg.sender, currSupply + i);
-            xEmitEvent.TokenMintEvent(address(this), msg.sender, currSupply + i, price);
+            xEmitEvent.TokenMintEvent(
+                address(this),
+                msg.sender,
+                currSupply + i,
+                price
+            );
         }
         currentSupply += _amount;
     }
@@ -94,7 +97,12 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         uint currSupply = currentSupply;
         for (uint256 i = 0; i < _amount; i++) {
             _mint(_recipient, currSupply + i);
-            xEmitEvent.TokenMintEvent(address(this), _recipient, currSupply + i, price);
+            xEmitEvent.TokenMintEvent(
+                address(this),
+                _recipient,
+                currSupply + i,
+                price
+            );
         }
         currentSupply += _amount;
     }
@@ -106,7 +114,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     function increaseSupplyLimit(uint256 _increaseBy) external onlyAdmin {
         uint newSupply = supplyLimit + _increaseBy;
-        xEmitEvent.SupplyLimitUpdatedEvent(address(this), supplyLimit, newSupply);
+        xEmitEvent.SupplyLimitUpdatedEvent(
+            address(this),
+            supplyLimit,
+            newSupply
+        );
         supplyLimit = newSupply;
     }
 
@@ -117,7 +129,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             "Request would decrease supply limit lower than current Supply"
         );
         uint newSupply = supplyLimit - _decreaseBy;
-        xEmitEvent.SupplyLimitUpdatedEvent(address(this), supplyLimit, newSupply);
+        xEmitEvent.SupplyLimitUpdatedEvent(
+            address(this),
+            supplyLimit,
+            newSupply
+        );
 
         supplyLimit = newSupply;
     }
@@ -196,7 +212,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         xEmitEvent.TeacherPaidEvent(address(this), teacherShares, amount);
     }
 
-    function getSubTeachers() public view returns (OGSLib.TeacherShare[] memory) {
+    function getSubTeachers()
+        public
+        view
+        returns (OGSLib.TeacherShare[] memory)
+    {
         return teacherShares;
     }
 

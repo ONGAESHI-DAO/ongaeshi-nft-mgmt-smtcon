@@ -46,7 +46,7 @@ contract TalentMatch is OwnableUpgradeable {
         sponsorShare = _sponsorShare;
         teacherShare = _teacherShare;
         admins[msg.sender] = true;
-        xEmitEvent = ICourseTokenEvent(_emitEventAddr);        
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }
 
     function updateShareScheme(
@@ -63,7 +63,12 @@ contract TalentMatch is OwnableUpgradeable {
         coachShare = _coachShare;
         sponsorShare = _sponsorShare;
         teacherShare = _teacherShare;
-        xEmitEvent.ShareSchemeUpdatedEvent(_talentShare, _coachShare, _sponsorShare, _teacherShare);
+        xEmitEvent.ShareSchemeUpdatedEvent(
+            _talentShare,
+            _coachShare,
+            _sponsorShare,
+            _teacherShare
+        );
     }
 
     function addTalentMatch(
@@ -86,7 +91,7 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.tokenId = _tokenId;
 
         matchRegistry[_talent] = newMatch;
-        xEmitEvent.TalentMatchAddedEvent(newMatch, _talent);    
+        xEmitEvent.TalentMatchAddedEvent(newMatch, _talent);
     }
 
     function updateTalentMatch(
@@ -143,7 +148,7 @@ contract TalentMatch is OwnableUpgradeable {
         );
 
         uint256 teacherAmount = (_amount * teacherShare) / 10000;
-        
+
         IERC20Upgradeable(gtAddress).safeTransferFrom(
             msg.sender,
             address(this),
