@@ -17,7 +17,12 @@ async function deployTestEnvFixture() {
     await courseTokenEvent.setExecutor(courseFactory.address, true);
     await courseTokenEvent.setExecutor(TalenMatch.address, true);
 
-    const teacherShares = [
+    // give accounts some GT
+    for (let i = 0; i < 5; i++) {
+        await gtContract.transfer(accounts[i].address, ethers.utils.parseEther("1000"));
+    }
+
+    const defaultTeacherShares = [
         {
             teacher: accounts[0].address,
             shares: 5000
@@ -32,9 +37,9 @@ async function deployTestEnvFixture() {
         }
     ]
     console.log(accounts[0].address);
-    await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), 100, accounts[0].address, teacherShares);
+    await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), 100, accounts[0].address, defaultTeacherShares);
     const courseNFT = await courseTokenDeployer.attach(await courseFactory.deployedAddresses(0));
-    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts};
+    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares};
 }
 
 module.exports = {

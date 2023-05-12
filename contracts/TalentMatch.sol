@@ -33,6 +33,8 @@ contract TalentMatch is OwnableUpgradeable {
         uint64 _teacherShare,
         address _emitEventAddr
     ) public initializer {
+        require(_tokenAddr != address(0), "_tokenAddr is zero");
+        require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         require(
             _talentShare + _coachShare + _sponsorShare + _teacherShare == 10000,
             "Shares do not sum to 10000"
@@ -153,6 +155,11 @@ contract TalentMatch is OwnableUpgradeable {
         );
         ICourseToken(matchData.nftAddress).payTeachers(teacherAmount);
         xEmitEvent.TalentMatchConfirmedEvent(matchData, _talent, _amount);
+    }
+
+    function setEmitEvent(address _emitEventAddr) external onlyOwner {
+        require(_emitEventAddr != address(0), "_emitEventAddr is zero");
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }
 
     // Support multiple wallets or address as admin

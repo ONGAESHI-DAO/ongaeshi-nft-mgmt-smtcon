@@ -23,6 +23,9 @@ contract CourseTokenFactory is OwnableUpgradeable {
         address _tokenAddr,
         address _emitEventAddr
     ) external initializer {
+        require(_beaconAddress != address(0), "_beaconAddress is zero");
+        require(_emitEventAddr != address(0), "_emitEventAddr is zero");
+        require(_tokenAddr != address(0), "_tokenAddr is zero");
         beaconAddr = _beaconAddress;
         gtAddress = _tokenAddr;
         xEmitEvent = ICourseTokenEvent(_emitEventAddr);
@@ -66,6 +69,16 @@ contract CourseTokenFactory is OwnableUpgradeable {
 
     function getAllDeployedTokens() external view returns (address[] memory) {
         return deployedAddresses;
+    }
+
+    function setBeaconAddr(address _beaconAddress) external onlyOwner {
+        require(_beaconAddress != address(0), "_beaconAddress is zero");
+        beaconAddr = _beaconAddress;
+    }
+    
+    function setEmitEvent(address _emitEventAddr) external onlyOwner {
+        require(_emitEventAddr != address(0), "_emitEventAddr is zero");
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }
 
     // Support multiple wallets or address as admin

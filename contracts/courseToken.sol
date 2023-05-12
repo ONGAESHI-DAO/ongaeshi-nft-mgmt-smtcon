@@ -21,8 +21,8 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     uint256 public price;
     uint256 public currentSupply;
     uint256 public supplyLimit;
-    address private gtAddress;
-    address private teacher;
+    address public gtAddress;
+    address public teacher;
     OGSLib.TeacherShare[] private teacherShares;
     ICourseTokenEvent public xEmitEvent;
 
@@ -41,6 +41,10 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         address _tokenAddr,
         address _emitEventAddr
     ) external initializer {
+        require(_teacher != address(0), "_teacher is zero");
+        require(_tokenAddr != address(0), "_tokenAddr is zero");
+        require(_emitEventAddr != address(0), "_emitEventAddr is zero");
+        require(_supplyLimit > 0, "_supplyLimit is zero");
         __Ownable_init();
         __ERC721_init(_name, _symbol);
         baseURI = _tokenBaseURI;
@@ -194,6 +198,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     function getSubTeachers() public view returns (OGSLib.TeacherShare[] memory) {
         return teacherShares;
+    }
+
+    function setEmitEvent(address _emitEventAddr) external onlyOwner {
+        require(_emitEventAddr != address(0), "_emitEventAddr is zero");
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }
 
     // Support multiple wallets or address as admin
