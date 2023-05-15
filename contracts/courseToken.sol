@@ -170,6 +170,12 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         return baseURI;
     }
 
+    function setBaseURI(
+        string calldata _newBaseURI
+    ) external onlyAdmin {
+        baseURI = _newBaseURI;
+    }
+
     function setTokenURI(
         uint256 _tokenId,
         string calldata _cid
