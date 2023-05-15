@@ -41,7 +41,7 @@ async function deployTestEnvFixture() {
     return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares };
 }
 
-async function deployTestEnvFixture() {
+async function deployTestEnvFixtureTalentMatch() {
 
     // Contracts are deployed using the first signer/account by default
     const [owner, ...accounts] = await ethers.getSigners();
@@ -87,5 +87,6 @@ async function deployTestEnvFixture() {
 }
 
 module.exports = {
-    deployTestEnvFixture
+    deployTestEnvFixture,
+    deployTestEnvFixtureTalentMatch
 };
