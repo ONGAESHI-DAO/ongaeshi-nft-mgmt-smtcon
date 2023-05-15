@@ -95,6 +95,10 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         address _recipient
     ) external onlyAdmin {
         uint currSupply = currentSupply;
+        require(
+            currSupply + _amount <= supplyLimit,
+            "Mint request exceeds supply limit"
+        );
         for (uint256 i = 0; i < _amount; i++) {
             _mint(_recipient, currSupply + i);
             xEmitEvent.TokenMintEvent(
@@ -123,7 +127,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     }
 
     function decreaseSupplyLimit(uint256 _decreaseBy) external onlyAdmin {
-        require(supplyLimit >= _decreaseBy, "Input greater than supply");
+        require(supplyLimit >= _decreaseBy, "Input greater than supplyLimit");
         require(
             supplyLimit - _decreaseBy >= currentSupply,
             "Request would decrease supply limit lower than current Supply"
