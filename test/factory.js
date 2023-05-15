@@ -78,12 +78,21 @@ describe("NFT Factory Test", function () {
   });
 
   describe("Factory Emit Event", function () {
-    it("Emits Event", async function () {
+    it("Emits Course Deployed Event", async function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
 
       await expect(
         courseFactory.deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), 100, accounts[0].address, defaultTeacherShares)
       ).to.emit(courseTokenEvent, "CourseDeployed").withArgs(await courseFactory.deployedAddresses(1), owner.address);
+
+    });
+
+    it("Emits Teacher Added Event", async function () {
+      const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
+
+      await expect(
+        courseFactory.deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), 100, accounts[0].address, defaultTeacherShares)
+      ).to.emit(courseTokenEvent, "TeacherAdded").withArgs(await courseFactory.deployedAddresses(1), anyValue);
 
     });
   });
