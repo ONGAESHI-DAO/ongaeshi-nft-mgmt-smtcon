@@ -33,6 +33,8 @@ contract TalentMatch is OwnableUpgradeable {
         uint64 _teacherShare,
         address _emitEventAddr
     ) public initializer {
+        require(_tokenAddr != address(0), "_tokenAddr is zero");
+        require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         require(
             _talentShare + _coachShare + _sponsorShare + _teacherShare == 10000,
             "Shares do not sum to 10000"
@@ -44,7 +46,7 @@ contract TalentMatch is OwnableUpgradeable {
         sponsorShare = _sponsorShare;
         teacherShare = _teacherShare;
         admins[msg.sender] = true;
-        xEmitEvent = ICourseTokenEvent(_emitEventAddr);        
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }
 
     function updateShareScheme(
@@ -61,7 +63,12 @@ contract TalentMatch is OwnableUpgradeable {
         coachShare = _coachShare;
         sponsorShare = _sponsorShare;
         teacherShare = _teacherShare;
-        xEmitEvent.ShareSchemeUpdatedEvent(_talentShare, _coachShare, _sponsorShare, _teacherShare);
+        xEmitEvent.ShareSchemeUpdatedEvent(
+            _talentShare,
+            _coachShare,
+            _sponsorShare,
+            _teacherShare
+        );
     }
 
     function addTalentMatch(
@@ -84,7 +91,7 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.tokenId = _tokenId;
 
         matchRegistry[_talent] = newMatch;
-        xEmitEvent.TalentMatchAddedEvent(newMatch, _talent);    
+        xEmitEvent.TalentMatchAddedEvent(newMatch, _talent);
     }
 
     function updateTalentMatch(
@@ -112,6 +119,10 @@ contract TalentMatch is OwnableUpgradeable {
 
     function deleteTalentMatch(address _talent) external onlyAdmin {
         OGSLib.MatchData memory _match = matchRegistry[_talent];
+        require(
+            _match.nftAddress != address(0),
+            "match data does not exists"
+        );
         xEmitEvent.TalentMatchDeletedEvent(_match, _talent);
         delete matchRegistry[_talent];
     }
@@ -141,7 +152,7 @@ contract TalentMatch is OwnableUpgradeable {
         );
 
         uint256 teacherAmount = (_amount * teacherShare) / 10000;
-        
+
         IERC20Upgradeable(gtAddress).safeTransferFrom(
             msg.sender,
             address(this),
@@ -153,6 +164,11 @@ contract TalentMatch is OwnableUpgradeable {
         );
         ICourseToken(matchData.nftAddress).payTeachers(teacherAmount);
         xEmitEvent.TalentMatchConfirmedEvent(matchData, _talent, _amount);
+    }
+
+    function setEmitEvent(address _emitEventAddr) external onlyOwner {
+        require(_emitEventAddr != address(0), "_emitEventAddr is zero");
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }
 
     // Support multiple wallets or address as admin

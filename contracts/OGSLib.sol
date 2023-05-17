@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 library OGSLib {
-   
     struct TeacherShare {
         address teacher;
         uint256 shares;
@@ -15,5 +14,4 @@ library OGSLib {
         address nftAddress;
         uint256 tokenId;
     }
-
 }
