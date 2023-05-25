@@ -188,7 +188,7 @@ describe("NFT Test", function () {
       expect(await courseNFT.isLended(0)).to.equal(true);
       expect(await courseNFT.isLended(1)).to.equal(false);
       expect(await courseNFT.isLended(2)).to.equal(false);
-
+      await expect(courseNFT.lendToken(42)).to.be.revertedWith("Token does not exists");
     });
 
     it("Repair", async function () {
@@ -210,6 +210,7 @@ describe("NFT Test", function () {
       expect((await courseNFT.repairCost(0)).toString()).to.equal(ethers.utils.parseEther("5").toString());
       expect((await courseNFT.repairCost(1)).toString()).to.equal(ethers.utils.parseEther("0").toString());
       expect((await courseNFT.repairCost(2)).toString()).to.equal(ethers.utils.parseEther("0").toString());
+      await courseNFT.lendToken(1); // this should work
     });
 
     it("Admin", async function () {
