@@ -34,5 +34,12 @@ module.exports = {
         runs: 200
       }
     },
+  },
+  gasReporter: {
+    enabled: true,
+    currency: 'JPY',
+    token: 'MATIC',
+    gasPrice: 137,
+    // coinmarketcap: "API KEY"
   }
 };
