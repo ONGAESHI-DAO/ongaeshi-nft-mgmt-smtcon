@@ -12,7 +12,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     using StringsUpgradeable for uint256;
 
     mapping(uint256 => bool) public isLended;
-    mapping(uint256 => bool) public needRepair;
+    mapping(uint256 => uint256) public repairCost;
     mapping(uint256 => string) public tokenCID;
     mapping(address => bool) public admins;
 
@@ -145,34 +145,41 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     function lendToken(uint256 _tokenId) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
         require(!isLended[_tokenId], "Token already lended");
+        require(repairCost[_tokenId] == 0, "Token needs repair");
         isLended[_tokenId] = true;
     }
 
-    function returnToken(uint256 _tokenId) external onlyAdmin {
+    function returnToken(
+        uint256 _tokenId,
+        uint256 _repairCost
+    ) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
         require(isLended[_tokenId], "Token not on loan");
         isLended[_tokenId] = false;
+        breakToken(_tokenId, _repairCost);
     }
 
-    function breakToken(uint256 _tokenId) external onlyAdmin {
+    function breakToken(uint256 _tokenId, uint256 _repairCost) internal {
         require(_exists(_tokenId), "Token does not exists");
-        require(!needRepair[_tokenId], "Token already needs repair");
-        needRepair[_tokenId] = true;
+        require(repairCost[_tokenId] == 0, "Token already needs repair");
+        if (_repairCost > 0) {
+            repairCost[_tokenId] = _repairCost;
+        }
     }
 
-    function repairToken(uint256 _tokenId) external onlyAdmin {
+    function repairToken(uint256 _tokenId) external {
+        uint256 nftRepairCost = repairCost[_tokenId];
         require(_exists(_tokenId), "Token does not exists");
-        require(needRepair[_tokenId], "Token does not need repair");
-        needRepair[_tokenId] = false;
+        require(nftRepairCost > 0, "Token does not need repair");
+        delete repairCost[_tokenId];
+        payTeachers(nftRepairCost);
     }
 
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
     }
 
-    function setBaseURI(
-        string calldata _newBaseURI
-    ) external onlyAdmin {
+    function setBaseURI(string calldata _newBaseURI) external onlyAdmin {
         baseURI = _newBaseURI;
     }
 
