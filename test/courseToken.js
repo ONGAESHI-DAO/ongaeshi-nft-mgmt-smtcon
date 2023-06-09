@@ -104,6 +104,39 @@ describe("NFT Test", function () {
 
     });
 
+    it("Change Commission Fee", async function () {
+      const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
+
+      expect((await courseNFT.commissionFee()).toString()).to.equal(ethers.utils.parseEther("0.1").toString());
+      await courseNFT.setCommissionFee(ethers.utils.parseEther("0.2"));
+      expect((await courseNFT.commissionFee()).toString()).to.equal(ethers.utils.parseEther("0.2").toString());
+
+      await gtContract.connect(accounts[4]).approve(courseNFT.address, ethers.utils.parseEther("12"));
+      const balBefore = await gtContract.balanceOf(accounts[9].address);
+      await courseNFT.connect(accounts[4]).mint(10);
+      expect(await courseNFT.balanceOf(accounts[4].address)).to.equal(10);
+      const balAfter = await gtContract.balanceOf(accounts[9].address);
+      expect(balAfter.sub(balBefore).toString()).to.equal(ethers.utils.parseEther("2").toString())
+
+    });
+
+    it("Change Treasury", async function () {
+      const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
+
+      expect(await courseNFT.treasury()).to.equal(accounts[9].address);
+      await courseNFT.setTreasury(accounts[10].address);
+      expect(await courseNFT.treasury()).to.equal(accounts[10].address);
+
+
+      await gtContract.connect(accounts[4]).approve(courseNFT.address, ethers.utils.parseEther("11"));
+      const balBefore = await gtContract.balanceOf(accounts[10].address);
+      await courseNFT.connect(accounts[4]).mint(10);
+      expect(await courseNFT.balanceOf(accounts[4].address)).to.equal(10);
+      const balAfter = await gtContract.balanceOf(accounts[10].address);
+      expect(balAfter.sub(balBefore).toString()).to.equal(ethers.utils.parseEther("1").toString())
+
+    });
+
     it("Teacher Shares", async function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
 
@@ -224,6 +257,8 @@ describe("NFT Test", function () {
       await expect(courseNFT.connect(accounts[0]).returnToken(1, ethers.utils.parseEther("1"))).to.be.revertedWith("admin: wut?");
       await expect(courseNFT.connect(accounts[0]).setTokenURI(1, "1.json")).to.be.revertedWith("admin: wut?");
       await expect(courseNFT.connect(accounts[0]).setTokenURIs([0, 1, 2], ["0.json", "1.json", "2.json"])).to.be.revertedWith("admin: wut?");
+      await expect(courseNFT.connect(accounts[0]).setTreasury(accounts[2].address)).to.be.revertedWith("admin: wut?");
+
 
       await courseNFT.setAdmin(accounts[0].address, true);
       await courseNFT.connect(accounts[0]).setPrice(ethers.utils.parseEther("5")) // this should not revert
