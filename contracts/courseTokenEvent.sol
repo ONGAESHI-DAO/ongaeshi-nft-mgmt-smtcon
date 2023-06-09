@@ -17,23 +17,33 @@ contract CourseTokenEvent is OwnableUpgradeable {
     event TokenMint(
         address indexed destAddress,
         address indexed courseAddress,
-        uint tokenId,
-        uint price
+        uint256 tokenId,
+        uint256 price
     );
     event PriceUpdated(
         address indexed courseAddress,
-        uint oldPrice,
-        uint newPrice
+        uint256 oldPrice,
+        uint256 newPrice
+    );
+    event FeeUpdated(
+        address indexed courseAddress,
+        uint256 oldFee,
+        uint256 newFee
+    );
+    event TreasuryUpdated(
+        address indexed courseAddress,
+        address oldTreasury,
+        address newTreasury
     );
     event SupplyLimitUpdated(
         address indexed courseAddress,
-        uint oldSupplyLimit,
-        uint newSupplyLimit
+        uint256 oldSupplyLimit,
+        uint256 newSupplyLimit
     );
     event TeacherPaid(
         address indexed courseAddress,
         OGSLib.TeacherShare[] teachers,
-        uint totalamount
+        uint256 totalamount
     );
     event TeacherAdded(
         address indexed courseAddress,
@@ -46,7 +56,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
     event TalentMatchConfirmed(
         OGSLib.MatchData existingMatch,
         address indexed talentAddr,
-        uint amount
+        uint256 amount
     );
     event TalentMatchUpdated(
         OGSLib.MatchData existingMatch,
@@ -57,10 +67,10 @@ contract CourseTokenEvent is OwnableUpgradeable {
         address indexed talentAddr
     );
     event ShareSchemeUpdated(
-        uint talentShare,
-        uint coachShare,
-        uint sponsorShare,
-        uint teacherShare
+        uint256 talentShare,
+        uint256 coachShare,
+        uint256 sponsorShare,
+        uint256 teacherShare
     );
 
     function initialize() external initializer {
@@ -69,10 +79,10 @@ contract CourseTokenEvent is OwnableUpgradeable {
     }
 
     function ShareSchemeUpdatedEvent(
-        uint _talentShare,
-        uint _coachShare,
-        uint _sponsorShare,
-        uint _teacherShare
+        uint256 _talentShare,
+        uint256 _coachShare,
+        uint256 _sponsorShare,
+        uint256 _teacherShare
     ) external onlyExecutor {
         emit ShareSchemeUpdated(
             _talentShare,
@@ -92,7 +102,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
     function TalentMatchConfirmedEvent(
         OGSLib.MatchData memory _match,
         address _talentAddr,
-        uint _amount
+        uint256 _amount
     ) external onlyExecutor {
         emit TalentMatchConfirmed(_match, _talentAddr, _amount);
     }
@@ -114,24 +124,40 @@ contract CourseTokenEvent is OwnableUpgradeable {
     function TokenMintEvent(
         address _courseAddress,
         address _destiny,
-        uint _tokenId,
-        uint _price
+        uint256 _tokenId,
+        uint256 _price
     ) external onlyExecutor {
         emit TokenMint(_destiny, _courseAddress, _tokenId, _price);
     }
 
     function PriceUpdatedEvent(
         address _courseAddress,
-        uint _oldPrice,
-        uint _newPrice
+        uint256 _oldPrice,
+        uint256 _newPrice
     ) external onlyExecutor {
         emit PriceUpdated(_courseAddress, _oldPrice, _newPrice);
     }
 
+    function FeeUpdatedEvent(
+        address _courseAddress,
+        uint256 _oldFee,
+        uint256 _newFee
+    ) external onlyExecutor {
+        emit PriceUpdated(_courseAddress, _oldFee, _newFee);
+    }
+
+    function TreasuryUpdatedEvent(
+        address _courseAddress,
+        address _oldTreasury,
+        address _newTreasury
+    ) external onlyExecutor {
+        emit TreasuryUpdated(_courseAddress, _oldTreasury, _newTreasury);
+    }
+
     function SupplyLimitUpdatedEvent(
         address _courseAddress,
-        uint _oldSupplyLimit,
-        uint _newSupplyLimit
+        uint256 _oldSupplyLimit,
+        uint256 _newSupplyLimit
     ) external onlyExecutor {
         emit SupplyLimitUpdated(
             _courseAddress,
@@ -150,7 +176,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
     function TeacherPaidEvent(
         address _courseAddress,
         OGSLib.TeacherShare[] calldata _teachers,
-        uint _totalamount
+        uint256 _totalamount
     ) external onlyExecutor {
         emit TeacherPaid(_courseAddress, _teachers, _totalamount);
     }
