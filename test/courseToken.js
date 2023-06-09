@@ -258,6 +258,7 @@ describe("NFT Test", function () {
       await expect(courseNFT.connect(accounts[0]).setTokenURI(1, "1.json")).to.be.revertedWith("admin: wut?");
       await expect(courseNFT.connect(accounts[0]).setTokenURIs([0, 1, 2], ["0.json", "1.json", "2.json"])).to.be.revertedWith("admin: wut?");
       await expect(courseNFT.connect(accounts[0]).setTreasury(accounts[2].address)).to.be.revertedWith("admin: wut?");
+      await expect(courseNFT.connect(accounts[0]).setCommissionFee(ethers.utils.parseEther("0.2"))).to.be.revertedWith("admin: wut?");
 
 
       await courseNFT.setAdmin(accounts[0].address, true);
