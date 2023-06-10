@@ -119,10 +119,7 @@ contract TalentMatch is OwnableUpgradeable {
 
     function deleteTalentMatch(address _talent) external onlyAdmin {
         OGSLib.MatchData memory _match = matchRegistry[_talent];
-        require(
-            _match.nftAddress != address(0),
-            "match data does not exists"
-        );
+        require(_match.nftAddress != address(0), "match data does not exists");
         xEmitEvent.TalentMatchDeletedEvent(_match, _talent);
         delete matchRegistry[_talent];
     }
