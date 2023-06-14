@@ -4,17 +4,19 @@ import "../OGSLib.sol";
 
 interface ICourseTokenEvent {
     
-	function TokenMintEvent(address _courseAddress, address _destiny, uint _tokenId, uint _price) external;
-	function PriceUpdatedEvent(address _courseAddress, uint _oldPrice, uint _newPrice) external;
-	function SupplyLimitUpdatedEvent(address _courseAddress, uint _oldSupplyLimit, uint _newSupplyLimit) external;
+	function TokenMintEvent(address _courseAddress, address _destiny, uint256 _tokenId, uint256 _price) external;
+	function PriceUpdatedEvent(address _courseAddress, uint256 _oldPrice, uint256 _newPrice) external;
+	function FeeUpdatedEvent(address _courseAddress, uint256 _oldFee, uint256 _newFee) external;
+	function TreasuryUpdatedEvent(address _courseAddress, address _oldTreasury, address _newTreasury) external;
+	function SupplyLimitUpdatedEvent(address _courseAddress, uint256 _oldSupplyLimit, uint256 _newSupplyLimit) external;
 	function CourseDeployedEvent(address _courseAddress, address _sender) external;
-	function TeacherPaidEvent(address _courseAddress, OGSLib.TeacherShare[] calldata _teachers, uint _totalamount) external;
+	function TeacherPaidEvent(address _courseAddress, OGSLib.TeacherShare[] calldata _teachers, uint256 _totalamount) external;
 	function TeacherAddedEvent(address _courseAddress, OGSLib.TeacherShare[] calldata _teachers) external;
 	function TalentMatchAddedEvent(OGSLib.MatchData memory _newMatch, address _talentAddr) external;
-	function TalentMatchConfirmedEvent(OGSLib.MatchData memory _match, address _talentAddr, uint _amount) external;
+	function TalentMatchConfirmedEvent(OGSLib.MatchData memory _match, address _talentAddr, uint256 _amount) external;
 	function TalentMatchDeletedEvent(OGSLib.MatchData memory _match, address _talentAddr) external;
 	function TalentMatchUpdatedEvent(OGSLib.MatchData calldata _match, address _talentAddr) external;
-	function ShareSchemeUpdatedEvent(uint _talentShare, uint _coachShare, uint _sponsorShare, uint _teacherShare) external;
+	function ShareSchemeUpdatedEvent(uint256 _talentShare, uint256 _coachShare, uint256 _sponsorShare, uint256 _teacherShare) external;
 	function setExecutor(address _address, bool _allow) external;
 }
 
