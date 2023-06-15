@@ -267,6 +267,45 @@ describe("NFT Test", function () {
       await expect(courseNFT.connect(accounts[0]).setPrice(ethers.utils.parseEther("6"))).to.be.revertedWith("admin: wut?");
 
     });
+
+    it("Admin Teacher Shares", async function () {
+      const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
+
+      const teacherShares = [
+        {
+          teacher: accounts[0].address,
+          shares: 4500
+        },
+        {
+          teacher: accounts[1].address,
+          shares: 3000
+        },
+        {
+          teacher: accounts[2].address,
+          shares: 2500
+        }
+      ]
+      await courseNFT.addTeacherShares(teacherShares); // this should work
+      await courseNFT.mintByAdmin(3, accounts[0].address);
+      await expect(courseNFT.addTeacherShares(defaultTeacherShares)).to.be.revertedWith("Cannot update Teachershares after NFT minted");
+    });
+
+    it("Teacher Shares not initialized", async function () {
+      const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
+
+      const courseTokenObj = await ethers.getContractFactory("CourseToken");
+      await courseFactory.deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), ethers.utils.parseEther("0.1"), 100, accounts[9].address);
+      const deployedNFT = await courseTokenObj.attach(await courseFactory.deployedAddresses(1));
+      await gtContract.connect(accounts[4]).approve(deployedNFT.address, ethers.utils.parseEther("1.1"));
+
+      await expect(deployedNFT.connect(accounts[4]).mint(1)).to.be.revertedWith("teacherShares not initialized");
+      await expect(deployedNFT.mintByAdmin(3, accounts[0].address)).to.be.revertedWith("teacherShares not initialized");
+
+      await deployedNFT.addTeacherShares(defaultTeacherShares);
+
+      await deployedNFT.connect(accounts[4]).mint(1); // this should work
+      await deployedNFT.mintByAdmin(3, accounts[0].address); // this should work
+    });
   });
 
   describe("NFT Emit Event", function () {
