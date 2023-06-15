@@ -60,10 +60,10 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     function addTeacherShares(
         OGSLib.TeacherShare[] calldata _teacherShares
-    ) external onlyOwner {
+    ) external onlyAdmin {
         require(
-            teacherShares.length == 0,
-            "Already initialized Teacher Shares"
+            currentSupply == 0,
+            "Cannot update Teachershares after NFT minted"
         );
         uint256 sum;
         for (uint256 i = 0; i < _teacherShares.length; i++) {
@@ -75,6 +75,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     }
 
     function mint(uint256 _amount) external {
+        require(teacherShares.length > 0, "teacherShares not initialized");
         uint256 currSupply = currentSupply;
         require(
             currSupply + _amount <= supplyLimit,
@@ -102,6 +103,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         uint256 _amount,
         address _recipient
     ) external onlyAdmin {
+        require(teacherShares.length > 0, "teacherShares not initialized");
         uint256 currSupply = currentSupply;
         require(
             currSupply + _amount <= supplyLimit,
