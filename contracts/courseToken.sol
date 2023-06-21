@@ -128,7 +128,8 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         price = _newPrice;
     }
 
-    function setCommissionFee(uint256 _treasuryFee) external onlyAdmin {
+    function setTreasuryFee(uint256 _treasuryFee) external onlyAdmin {
+        require(_treasuryFee <= 10000, "treasury fee cannot exceed 100%");
         xEmitEvent.FeeUpdatedEvent(
             address(this),
             treasuryFee,
