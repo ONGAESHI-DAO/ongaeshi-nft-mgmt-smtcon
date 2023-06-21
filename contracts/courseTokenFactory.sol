@@ -38,7 +38,7 @@ contract CourseTokenFactory is OwnableUpgradeable {
         string calldata _symbol,
         string calldata _tokenBaseURI,
         uint256 _price,
-        uint256 _commissionFee,
+        uint256 _treasuryFee,
         uint256 _supplyLimit,
         address _treasury
     ) external onlyAdmin {
@@ -52,7 +52,7 @@ contract CourseTokenFactory is OwnableUpgradeable {
                 _symbol,
                 _tokenBaseURI,
                 _price,
-                _commissionFee,
+                _treasuryFee,
                 _supplyLimit,
                 _treasury,
                 gtAddress,

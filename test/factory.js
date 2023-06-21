@@ -27,7 +27,7 @@ describe("NFT Factory Test", function () {
         }
       ]
       expect((await courseFactory.getAllDeployedTokens()).length).to.equal(1);
-      await courseFactory.deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), ethers.utils.parseEther("0.1"), 100, accounts[9].address);
+      await courseFactory.deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address);
       expect((await courseFactory.getAllDeployedTokens()).length).to.equal(2);
       const deployedNFT = await courseTokenObj.attach(await courseFactory.deployedAddresses(1));
       await deployedNFT.addTeacherShares(teacherShares);
@@ -52,7 +52,7 @@ describe("NFT Factory Test", function () {
     it("Not Admin Deploy NFT", async function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
       await expect(
-        courseFactory.connect(accounts[0]).deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), ethers.utils.parseEther("0.1"), 100, accounts[9].address)
+        courseFactory.connect(accounts[0]).deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address)
       ).to.be.revertedWith("admin: wut?");
     });
 
@@ -61,7 +61,7 @@ describe("NFT Factory Test", function () {
 
       await courseFactory.setAdmin(accounts[0].address, true);
       expect((await courseFactory.getAllDeployedTokens()).length).to.equal(1);
-      await courseFactory.connect(accounts[0]).deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), ethers.utils.parseEther("0.1"), 100, accounts[9].address)
+      await courseFactory.connect(accounts[0]).deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address)
       expect((await courseFactory.getAllDeployedTokens()).length).to.equal(2);
     });
 
@@ -69,11 +69,11 @@ describe("NFT Factory Test", function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
       await courseFactory.setAdmin(accounts[0].address, true);
       expect((await courseFactory.getAllDeployedTokens()).length).to.equal(1);
-      await courseFactory.connect(accounts[0]).deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), ethers.utils.parseEther("0.1"), 100, accounts[9].address)
+      await courseFactory.connect(accounts[0]).deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address)
       expect((await courseFactory.getAllDeployedTokens()).length).to.equal(2);
       await courseFactory.setAdmin(accounts[0].address, false);
       await expect(
-        courseFactory.connect(accounts[0]).deployCourseToken("Token 2", "T2", "test://uri2/", ethers.utils.parseEther("2"), ethers.utils.parseEther("0.2"), 200, accounts[9].address)
+        courseFactory.connect(accounts[0]).deployCourseToken("Token 2", "T2", "test://uri2/", ethers.utils.parseEther("2"), 9000, 200, accounts[9].address)
       ).to.be.revertedWith("admin: wut?");
     });
   });
@@ -83,7 +83,7 @@ describe("NFT Factory Test", function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
 
       await expect(
-        courseFactory.deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), ethers.utils.parseEther("0.1"), 100, accounts[9].address)
+        courseFactory.deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address)
       ).to.emit(courseTokenEvent, "CourseDeployed").withArgs(await courseFactory.deployedAddresses(1), owner.address);
 
     });
@@ -92,7 +92,7 @@ describe("NFT Factory Test", function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
 
       const courseTokenObj = await ethers.getContractFactory("CourseToken");
-      await courseFactory.deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), ethers.utils.parseEther("0.1"), 100, accounts[9].address)
+      await courseFactory.deployCourseToken("Token 1", "T1", "test://uri1/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address)
       const deployedNFT = await courseTokenObj.attach(await courseFactory.deployedAddresses(1));
 
       await expect(
