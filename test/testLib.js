@@ -36,7 +36,7 @@ async function deployTestEnvFixture() {
             shares: 1000
         }
     ]
-    await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), ethers.utils.parseEther("0.1"), 100, accounts[9].address, 9000);
+    await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address);
     const courseNFT = await courseTokenDeployer.attach(await courseFactory.deployedAddresses(0));
     await courseNFT.addTeacherShares(defaultTeacherShares);
     return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares };
@@ -80,7 +80,7 @@ async function deployTestEnvFixtureTalentMatch() {
             shares: 1000
         }
     ]
-    await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), ethers.utils.parseEther("0.1"), 100, accounts[9].address, 9000);
+    await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address);
     const courseNFT = await courseTokenDeployer.attach(await courseFactory.deployedAddresses(0));
     await courseNFT.addTeacherShares(defaultTeacherShares);
     await courseNFT.mintByAdmin(3, accounts[8].address);

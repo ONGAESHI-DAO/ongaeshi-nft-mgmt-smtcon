@@ -18,12 +18,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     string public baseURI;
     uint256 public price;
-    uint256 public commissionFee;
     uint256 public currentSupply;
     uint256 public supplyLimit;
     address public gtAddress;
     address public treasury;
-    uint256 public treasuryPercentage;
+    uint256 public treasuryFee;
     OGSLib.TeacherShare[] private teacherShares;
     ICourseTokenEvent public xEmitEvent;
 
@@ -37,10 +36,9 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         string calldata _symbol,
         string calldata _tokenBaseURI,
         uint256 _price,
-        uint256 _commissionFee,
+        uint256 _treasuryFee,
         uint256 _supplyLimit,
         address _treasury,
-        uint256 _treasuryPercentage,
         address _tokenAddr,
         address _emitEventAddr
     ) external initializer {
@@ -52,10 +50,9 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         __ERC721_init(_name, _symbol);
         baseURI = _tokenBaseURI;
         price = _price;
-        commissionFee = _commissionFee;
         supplyLimit = _supplyLimit;
         treasury = _treasury;
-        treasuryPercentage = _treasuryPercentage;
+        treasuryFee = _treasuryFee;
         gtAddress = _tokenAddr;
         xEmitEvent = ICourseTokenEvent(_emitEventAddr);
         admins[msg.sender] = true;
@@ -85,12 +82,12 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             "Mint request exceeds supply limit"
         );
         uint256 fullAmountPrice = _amount * price;
-        uint256 treasuryCut = (fullAmountPrice * treasuryPercentage) / 10000;
+        uint256 treasuryCut = (fullAmountPrice * treasuryFee) / 10000;
         payTeachers(fullAmountPrice - treasuryCut);
         IERC20Upgradeable(gtAddress).safeTransferFrom(
             msg.sender,
             treasury,
-            (commissionFee * _amount) + treasuryCut
+            treasuryCut
         );
         for (uint256 i = 0; i < _amount; i++) {
             _mint(msg.sender, currSupply + i);
@@ -131,13 +128,13 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         price = _newPrice;
     }
 
-    function setCommissionFee(uint256 _commissionFee) external onlyAdmin {
+    function setCommissionFee(uint256 _treasuryFee) external onlyAdmin {
         xEmitEvent.FeeUpdatedEvent(
             address(this),
-            commissionFee,
-            _commissionFee
+            treasuryFee,
+            _treasuryFee
         );
-        commissionFee = _commissionFee;
+        treasuryFee = _treasuryFee;
     }
 
     function setTreasury(address _treasury) external onlyAdmin {
@@ -203,13 +200,20 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         require(nftRepairCost > 0, "Token does not need repair");
         delete repairCost[_tokenId];
 
-        uint256 treasuryCut = (nftRepairCost * treasuryPercentage) / 10000;
+        uint256 treasuryCut = (nftRepairCost * treasuryFee) / 10000;
         IERC20Upgradeable(gtAddress).safeTransferFrom(
             msg.sender,
             treasury,
             treasuryCut
         );
         payTeachers(nftRepairCost - treasuryCut);
+    }
+
+    function repairTokenByAdmin(uint256 _tokenId) external onlyAdmin {
+        uint256 nftRepairCost = repairCost[_tokenId];
+        require(_exists(_tokenId), "Token does not exists");
+        require(nftRepairCost > 0, "Token does not need repair");
+        delete repairCost[_tokenId];
     }
 
     function _baseURI() internal view override returns (string memory) {
