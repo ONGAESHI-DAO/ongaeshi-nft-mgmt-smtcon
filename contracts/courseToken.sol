@@ -130,11 +130,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     function setTreasuryFee(uint256 _treasuryFee) external onlyAdmin {
         require(_treasuryFee <= 10000, "treasury fee cannot exceed 100%");
-        xEmitEvent.FeeUpdatedEvent(
-            address(this),
-            treasuryFee,
-            _treasuryFee
-        );
+        xEmitEvent.FeeUpdatedEvent(address(this), treasuryFee, _treasuryFee);
         treasuryFee = _treasuryFee;
     }
 
@@ -192,6 +188,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         require(repairCost[_tokenId] == 0, "Token already needs repair");
         if (_repairCost > 0) {
             repairCost[_tokenId] = _repairCost;
+            xEmitEvent.NeedRepairEvent(address(this), _tokenId, _repairCost);
         }
     }
 
@@ -208,6 +205,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             treasuryCut
         );
         payTeachers(nftRepairCost - treasuryCut);
+        xEmitEvent.RepairedEvent(address(this), _tokenId);
     }
 
     function repairTokenByAdmin(uint256 _tokenId) external onlyAdmin {
@@ -215,6 +213,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         require(_exists(_tokenId), "Token does not exists");
         require(nftRepairCost > 0, "Token does not need repair");
         delete repairCost[_tokenId];
+        xEmitEvent.RepairedEvent(address(this), _tokenId);
     }
 
     function _baseURI() internal view override returns (string memory) {

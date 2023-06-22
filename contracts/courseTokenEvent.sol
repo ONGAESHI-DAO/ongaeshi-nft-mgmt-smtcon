@@ -72,6 +72,12 @@ contract CourseTokenEvent is OwnableUpgradeable {
         uint256 sponsorShare,
         uint256 teacherShare
     );
+    event NeedRepair(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        uint256 repairCost
+    );
+    event Repaired(address indexed courseAddress, uint256 indexed tokenId);
 
     function initialize() external initializer {
         __Ownable_init();
@@ -186,6 +192,21 @@ contract CourseTokenEvent is OwnableUpgradeable {
         OGSLib.TeacherShare[] calldata _teachers
     ) external onlyExecutor {
         emit TeacherAdded(_courseAddress, _teachers);
+    }
+
+    function NeedRepairEvent(
+        address _courseAddress,
+        uint256 _tokenId,
+        uint256 _repairCost
+    ) external onlyExecutor {
+        emit NeedRepair(_courseAddress, _tokenId, _repairCost);
+    }
+
+    function RepairedEvent(
+        address _courseAddress,
+        uint256 _tokenId
+    ) external onlyExecutor {
+        emit Repaired(_courseAddress, _tokenId);
     }
 
     // Support multiple wallets or address as admin
