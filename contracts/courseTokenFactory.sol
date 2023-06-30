@@ -38,10 +38,9 @@ contract CourseTokenFactory is OwnableUpgradeable {
         string calldata _symbol,
         string calldata _tokenBaseURI,
         uint256 _price,
-        uint256 _commissionFee,
+        uint256 _treasuryFee,
         uint256 _supplyLimit,
-        address _treasury,
-        ICourseToken.TeacherShare[] calldata _teacherShares
+        address _treasury
     ) external onlyAdmin {
         string
             memory initializerFunction = "initialize(string,string,string,uint256,uint256,uint256,address,address,address)";
@@ -53,7 +52,7 @@ contract CourseTokenFactory is OwnableUpgradeable {
                 _symbol,
                 _tokenBaseURI,
                 _price,
-                _commissionFee,
+                _treasuryFee,
                 _supplyLimit,
                 _treasury,
                 gtAddress,
@@ -64,7 +63,6 @@ contract CourseTokenFactory is OwnableUpgradeable {
         deployedAddresses.push(newAddr);
         xEmitEvent.setExecutor(newAddr, true);
         ICourseToken(newAddr).setAdmin(msg.sender, true);
-        ICourseToken(newAddr).addTeacherShares(_teacherShares);
         OwnableUpgradeable(newAddr).transferOwnership(msg.sender);
         xEmitEvent.CourseDeployedEvent(newAddr, msg.sender);
     }
