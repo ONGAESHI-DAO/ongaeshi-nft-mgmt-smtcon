@@ -89,7 +89,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             treasury,
             treasuryCut
         );
-        for (uint256 i = 0; i < _amount; i++) {
+        for (uint256 i = 1; i <= _amount; i++) {
             _mint(msg.sender, currSupply + i);
             xEmitEvent.TokenMintEvent(
                 address(this),
@@ -111,7 +111,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             currSupply + _amount <= supplyLimit,
             "Mint request exceeds supply limit"
         );
-        for (uint256 i = 0; i < _amount; i++) {
+        for (uint256 i = 1; i <= _amount; i++) {
             _mint(_recipient, currSupply + i);
             xEmitEvent.TokenMintEvent(
                 address(this),

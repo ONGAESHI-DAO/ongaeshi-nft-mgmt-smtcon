@@ -77,7 +77,8 @@ contract TalentMatch is OwnableUpgradeable {
         address _sponsor,
         address _teacher,
         address _nftAddress,
-        uint256 _tokenId
+        uint256 _tokenId,
+        uint256 _amount
     ) external onlyAdmin {
         require(
             matchRegistry[_talent].nftAddress == address(0),
@@ -89,6 +90,7 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.teacher = _teacher;
         newMatch.nftAddress = _nftAddress;
         newMatch.tokenId = _tokenId;
+        newMatch.amount = _amount;
 
         matchRegistry[_talent] = newMatch;
         xEmitEvent.TalentMatchAddedEvent(newMatch, _talent);
@@ -100,7 +102,8 @@ contract TalentMatch is OwnableUpgradeable {
         address _sponsor,
         address _teacher,
         address _nftAddress,
-        uint256 _tokenId
+        uint256 _tokenId,
+        uint256 _amount
     ) external onlyAdmin {
         require(
             matchRegistry[_talent].nftAddress != address(0),
@@ -112,6 +115,7 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.teacher = _teacher;
         newMatch.nftAddress = _nftAddress;
         newMatch.tokenId = _tokenId;
+        newMatch.amount = _amount;
 
         matchRegistry[_talent] = newMatch;
         xEmitEvent.TalentMatchUpdatedEvent(newMatch, _talent);
@@ -130,6 +134,7 @@ contract TalentMatch is OwnableUpgradeable {
     ) external onlyAdmin {
         OGSLib.MatchData memory matchData = matchRegistry[_talent];
         require(matchData.nftAddress != address(0), "match does not exist");
+        require(matchData.amount == _amount, "amount does not match");
         delete matchRegistry[_talent];
 
         IERC20Upgradeable(gtAddress).safeTransferFrom(
