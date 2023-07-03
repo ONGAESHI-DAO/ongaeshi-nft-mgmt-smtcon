@@ -79,6 +79,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
         bool isCancel
     );
     event Repaired(address indexed courseAddress, uint256 indexed tokenId);
+    event TokenLended(address indexed courseAddress, uint256 indexed tokenId);
 
     function initialize() external initializer {
         __Ownable_init();
@@ -209,6 +210,13 @@ contract CourseTokenEvent is OwnableUpgradeable {
         uint256 _tokenId
     ) external onlyExecutor {
         emit Repaired(_courseAddress, _tokenId);
+    }
+
+    function TokenLendedEvent(
+        address _courseAddress,
+        uint256 _tokenId
+    ) external onlyExecutor {
+        emit TokenLended(_courseAddress, _tokenId);
     }
 
     // Support multiple wallets or address as admin

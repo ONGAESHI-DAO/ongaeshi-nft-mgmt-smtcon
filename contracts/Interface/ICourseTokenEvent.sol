@@ -20,6 +20,7 @@ interface ICourseTokenEvent {
 	function setExecutor(address _address, bool _allow) external;
 	function NeedRepairEvent(address _courseAddress, uint256 _tokenId, uint256 _repairCost, bool _isCancel) external;
     function RepairedEvent(address _courseAddress, uint256 _tokenId) external;
+	function TokenLendedEvent(address _courseAddress, uint256 _tokenId) external;
 }
 
 
