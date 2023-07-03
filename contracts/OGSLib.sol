@@ -13,5 +13,6 @@ library OGSLib {
         address teacher;
         address nftAddress;
         uint256 tokenId;
+        uint256 amount;
     }
 }
