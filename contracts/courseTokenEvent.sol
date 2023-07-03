@@ -75,7 +75,8 @@ contract CourseTokenEvent is OwnableUpgradeable {
     event NeedRepair(
         address indexed courseAddress,
         uint256 indexed tokenId,
-        uint256 repairCost
+        uint256 repairCost,
+        bool isCancel
     );
     event Repaired(address indexed courseAddress, uint256 indexed tokenId);
 
@@ -197,9 +198,10 @@ contract CourseTokenEvent is OwnableUpgradeable {
     function NeedRepairEvent(
         address _courseAddress,
         uint256 _tokenId,
-        uint256 _repairCost
+        uint256 _repairCost,
+        bool _isCancel
     ) external onlyExecutor {
-        emit NeedRepair(_courseAddress, _tokenId, _repairCost);
+        emit NeedRepair(_courseAddress, _tokenId, _repairCost, _isCancel);
     }
 
     function RepairedEvent(

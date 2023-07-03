@@ -18,7 +18,7 @@ describe("NFT Test", function () {
       const balBefore = await gtContract.balanceOf(accounts[4].address);
 
       await courseNFT.connect(accounts[4]).mint(1);
-      expect(await courseNFT.ownerOf(0)).to.equal(accounts[4].address);  // Check owner of nft token id 0 is minter
+      expect(await courseNFT.ownerOf(1)).to.equal(accounts[4].address);  // Check owner of nft token id 0 is minter
       await courseNFT.connect(accounts[4]).mint(10);
       expect(await courseNFT.balanceOf(accounts[4].address)).to.equal(11);
 
@@ -29,7 +29,7 @@ describe("NFT Test", function () {
     it("Admin Mint NFT", async function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
       await courseNFT.mintByAdmin(1, accounts[0].address);
-      expect(await courseNFT.ownerOf(0)).to.equal(accounts[0].address);
+      expect(await courseNFT.ownerOf(1)).to.equal(accounts[0].address);
       await courseNFT.mintByAdmin(20, accounts[0].address);
       expect(await courseNFT.balanceOf(accounts[0].address)).to.equal(21);
     });
@@ -179,9 +179,9 @@ describe("NFT Test", function () {
     it("Token URI", async function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
       await courseNFT.mintByAdmin(3, accounts[0].address);
-      expect(await courseNFT.tokenURI(0)).to.equal(BASE_URI + "0");
       expect(await courseNFT.tokenURI(1)).to.equal(BASE_URI + "1");
       expect(await courseNFT.tokenURI(2)).to.equal(BASE_URI + "2");
+      expect(await courseNFT.tokenURI(3)).to.equal(BASE_URI + "3");
     });
 
     it("Set Token URI", async function () {
@@ -199,10 +199,10 @@ describe("NFT Test", function () {
       await courseNFT.mintByAdmin(3, accounts[0].address);
       expect(await courseNFT.tokenURI(1)).to.equal(BASE_URI + "1");
       expect(await courseNFT.tokenURI(2)).to.equal(BASE_URI + "2");
-      await courseNFT.setTokenURIs([0, 1, 2], ["0.json", "1.json", "2.json"]);
-      expect(await courseNFT.tokenURI(0)).to.equal(BASE_URI + "0.json");
+      await courseNFT.setTokenURIs([1, 2, 3], ["1.json", "2.json", "3.json"]);
       expect(await courseNFT.tokenURI(1)).to.equal(BASE_URI + "1.json");
       expect(await courseNFT.tokenURI(2)).to.equal(BASE_URI + "2.json");
+      expect(await courseNFT.tokenURI(3)).to.equal(BASE_URI + "3.json");
 
     });
 
@@ -210,31 +210,31 @@ describe("NFT Test", function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
       await courseNFT.mintByAdmin(3, accounts[0].address);
       const NEW_BASE_URI = "https://api.igs.com.jp/0xABCDE...1234/metadata/";
-      expect(await courseNFT.tokenURI(0)).to.equal(BASE_URI + "0");
       expect(await courseNFT.tokenURI(1)).to.equal(BASE_URI + "1");
       expect(await courseNFT.tokenURI(2)).to.equal(BASE_URI + "2");
+      expect(await courseNFT.tokenURI(3)).to.equal(BASE_URI + "3");
 
       await courseNFT.setBaseURI(NEW_BASE_URI);
 
-      expect(await courseNFT.tokenURI(0)).to.equal(NEW_BASE_URI + "0");
       expect(await courseNFT.tokenURI(1)).to.equal(NEW_BASE_URI + "1");
       expect(await courseNFT.tokenURI(2)).to.equal(NEW_BASE_URI + "2");
+      expect(await courseNFT.tokenURI(3)).to.equal(NEW_BASE_URI + "3");
     });
 
     it("Lending", async function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
       await courseNFT.mintByAdmin(3, accounts[0].address);
 
-      await courseNFT.lendToken(0);
       await courseNFT.lendToken(1);
-      expect(await courseNFT.isLended(0)).to.equal(true);
+      await courseNFT.lendToken(2);
+      expect(await courseNFT.isLended(1)).to.equal(true);
+      expect(await courseNFT.isLended(2)).to.equal(true);
+      expect(await courseNFT.isLended(3)).to.equal(false);
+      await expect(courseNFT.lendToken(1)).to.be.revertedWith("Token already lended");
+      await courseNFT.returnToken(2, ethers.utils.parseEther("1"), false);
       expect(await courseNFT.isLended(1)).to.equal(true);
       expect(await courseNFT.isLended(2)).to.equal(false);
-      await expect(courseNFT.lendToken(0)).to.be.revertedWith("Token already lended");
-      await courseNFT.returnToken(1, ethers.utils.parseEther("1"));
-      expect(await courseNFT.isLended(0)).to.equal(true);
-      expect(await courseNFT.isLended(1)).to.equal(false);
-      expect(await courseNFT.isLended(2)).to.equal(false);
+      expect(await courseNFT.isLended(3)).to.equal(false);
       await expect(courseNFT.lendToken(42)).to.be.revertedWith("Token does not exists");
     });
 
@@ -242,22 +242,22 @@ describe("NFT Test", function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
       await courseNFT.mintByAdmin(3, accounts[0].address);
 
-      await courseNFT.lendToken(0);
       await courseNFT.lendToken(1);
-      await courseNFT.returnToken(0, ethers.utils.parseEther("5"));
-      await courseNFT.returnToken(1, ethers.utils.parseEther("1"));
-      expect((await courseNFT.repairCost(0)).toString()).to.equal(ethers.utils.parseEther("5").toString());
-      expect((await courseNFT.repairCost(1)).toString()).to.equal(ethers.utils.parseEther("1").toString());
-      expect((await courseNFT.repairCost(2)).toString()).to.equal(ethers.utils.parseEther("0").toString());
-      await expect(courseNFT.lendToken(0)).to.be.revertedWith("Token needs repair");
-      await expect(courseNFT.lendToken(0)).to.be.revertedWith("Token needs repair");
+      await courseNFT.lendToken(2);
+      await courseNFT.returnToken(1, ethers.utils.parseEther("5"), false);
+      await courseNFT.returnToken(2, ethers.utils.parseEther("1"), false);
+      expect((await courseNFT.repairCost(1)).toString()).to.equal(ethers.utils.parseEther("5").toString());
+      expect((await courseNFT.repairCost(2)).toString()).to.equal(ethers.utils.parseEther("1").toString());
+      expect((await courseNFT.repairCost(3)).toString()).to.equal(ethers.utils.parseEther("0").toString());
+      await expect(courseNFT.lendToken(1)).to.be.revertedWith("Token needs repair");
+      await expect(courseNFT.lendToken(2)).to.be.revertedWith("Token needs repair");
 
       await gtContract.approve(courseNFT.address, ethers.utils.parseEther("1"));
-      await courseNFT.repairToken(1);
-      expect((await courseNFT.repairCost(0)).toString()).to.equal(ethers.utils.parseEther("5").toString());
-      expect((await courseNFT.repairCost(1)).toString()).to.equal(ethers.utils.parseEther("0").toString());
+      await courseNFT.repairToken(2);
+      expect((await courseNFT.repairCost(1)).toString()).to.equal(ethers.utils.parseEther("5").toString());
       expect((await courseNFT.repairCost(2)).toString()).to.equal(ethers.utils.parseEther("0").toString());
-      await courseNFT.lendToken(1); // this should work
+      expect((await courseNFT.repairCost(3)).toString()).to.equal(ethers.utils.parseEther("0").toString());
+      await courseNFT.lendToken(2); // this should work
     });
 
     it("Repair Fee", async function () {
@@ -272,12 +272,12 @@ describe("NFT Test", function () {
       let balBefore2 = await gtContract.balanceOf(accounts[2].address);
       let balTreasuryBefore = await gtContract.balanceOf(accounts[9].address);
 
-      await courseNFT.lendToken(0);
+      await courseNFT.lendToken(2);
       await courseNFT.lendToken(1);
-      await courseNFT.returnToken(0, ethers.utils.parseEther("10"));
-      await courseNFT.returnToken(1, ethers.utils.parseEther("10"));
+      await courseNFT.returnToken(2, ethers.utils.parseEther("10"), false);
+      await courseNFT.returnToken(1, ethers.utils.parseEther("10"), false);
       await gtContract.approve(courseNFT.address, ethers.utils.parseEther("20"));
-      await courseNFT.repairToken(0);
+      await courseNFT.repairToken(2);
 
       let balAfter0 = await gtContract.balanceOf(accounts[0].address);
       let balAfter1 = await gtContract.balanceOf(accounts[1].address);
@@ -314,13 +314,13 @@ describe("NFT Test", function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
       await courseNFT.mintByAdmin(1, accounts[0].address);
 
-      await courseNFT.lendToken(0);
-      await courseNFT.returnToken(0, ethers.utils.parseEther("5"));
-      expect((await courseNFT.repairCost(0)).toString()).to.equal(ethers.utils.parseEther("5").toString());
-      await expect(courseNFT.lendToken(0)).to.be.revertedWith("Token needs repair");
-      await courseNFT.repairTokenByAdmin(0);
-      expect((await courseNFT.repairCost(0)).toString()).to.equal(ethers.utils.parseEther("0").toString());
-      await courseNFT.lendToken(0); // this should work
+      await courseNFT.lendToken(1);
+      await courseNFT.returnToken(1, ethers.utils.parseEther("5"), false);
+      expect((await courseNFT.repairCost(1)).toString()).to.equal(ethers.utils.parseEther("5").toString());
+      await expect(courseNFT.lendToken(1)).to.be.revertedWith("Token needs repair");
+      await courseNFT.repairTokenByAdmin(1);
+      expect((await courseNFT.repairCost(1)).toString()).to.equal(ethers.utils.parseEther("0").toString());
+      await courseNFT.lendToken(1); // this should work
     });
 
     it("Admin", async function () {
@@ -331,7 +331,7 @@ describe("NFT Test", function () {
       await expect(courseNFT.connect(accounts[0]).increaseSupplyLimit(1)).to.be.revertedWith("admin: wut?");
       await expect(courseNFT.connect(accounts[0]).decreaseSupplyLimit(1)).to.be.revertedWith("admin: wut?");
       await expect(courseNFT.connect(accounts[0]).lendToken(1)).to.be.revertedWith("admin: wut?");
-      await expect(courseNFT.connect(accounts[0]).returnToken(1, ethers.utils.parseEther("1"))).to.be.revertedWith("admin: wut?");
+      await expect(courseNFT.connect(accounts[0]).returnToken(1, ethers.utils.parseEther("1"), false)).to.be.revertedWith("admin: wut?");
       await expect(courseNFT.connect(accounts[0]).setTokenURI(1, "1.json")).to.be.revertedWith("admin: wut?");
       await expect(courseNFT.connect(accounts[0]).setTokenURIs([0, 1, 2], ["0.json", "1.json", "2.json"])).to.be.revertedWith("admin: wut?");
       await expect(courseNFT.connect(accounts[0]).setTreasury(accounts[2].address)).to.be.revertedWith("admin: wut?");

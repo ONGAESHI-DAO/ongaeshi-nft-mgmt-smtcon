@@ -18,7 +18,7 @@ interface ICourseTokenEvent {
 	function TalentMatchUpdatedEvent(OGSLib.MatchData calldata _match, address _talentAddr) external;
 	function ShareSchemeUpdatedEvent(uint256 _talentShare, uint256 _coachShare, uint256 _sponsorShare, uint256 _teacherShare) external;
 	function setExecutor(address _address, bool _allow) external;
-	function NeedRepairEvent(address _courseAddress, uint256 _tokenId, uint256 _repairCost) external;
+	function NeedRepairEvent(address _courseAddress, uint256 _tokenId, uint256 _repairCost, bool _isCancel) external;
     function RepairedEvent(address _courseAddress, uint256 _tokenId) external;
 }
 

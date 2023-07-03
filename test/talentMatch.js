@@ -12,7 +12,7 @@ describe("NFT Factory Test", function () {
 
         it("Add Talent Match", async function () {
             const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixtureTalentMatch);
-            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0);
+            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
 
             const data = await TalenMatch.matchRegistry(accounts[5].address)
             expect(data.coach).to.equal(accounts[6].address);
@@ -24,7 +24,7 @@ describe("NFT Factory Test", function () {
 
         it("Update Talent Match", async function () {
             const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixtureTalentMatch);
-            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0);
+            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
             const data = await TalenMatch.matchRegistry(accounts[5].address)
             expect(data.coach).to.equal(accounts[6].address);
             expect(data.sponsor).to.equal(accounts[7].address);
@@ -32,7 +32,7 @@ describe("NFT Factory Test", function () {
             expect(data.nftAddress).to.equal(courseNFT.address);
             expect(data.tokenId).to.equal(0);
 
-            await TalenMatch.updateTalentMatch(accounts[5].address, accounts[10].address, accounts[11].address, accounts[12].address, courseNFT.address, 0);
+            await TalenMatch.updateTalentMatch(accounts[5].address, accounts[10].address, accounts[11].address, accounts[12].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
             const data2 = await TalenMatch.matchRegistry(accounts[5].address)
             expect(data2.coach).to.equal(accounts[10].address);
             expect(data2.sponsor).to.equal(accounts[11].address);
@@ -41,14 +41,14 @@ describe("NFT Factory Test", function () {
             expect(data2.tokenId).to.equal(0);
 
             await expect(
-                TalenMatch.updateTalentMatch(accounts[6].address, accounts[10].address, accounts[11].address, accounts[12].address, courseNFT.address, 1)
+                TalenMatch.updateTalentMatch(accounts[6].address, accounts[10].address, accounts[11].address, accounts[12].address, courseNFT.address, 1, ethers.utils.parseEther("100"))
             ).to.be.revertedWith("match data does not exists");
 
         });
 
         it("Delete Talent Match", async function () {
             const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixtureTalentMatch);
-            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0);
+            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
             const data = await TalenMatch.matchRegistry(accounts[5].address)
             expect(data.coach).to.equal(accounts[6].address);
             expect(data.sponsor).to.equal(accounts[7].address);
@@ -71,7 +71,7 @@ describe("NFT Factory Test", function () {
 
         it("Confirm Talent Match", async function () {
             const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixtureTalentMatch);
-            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0);
+            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
 
             const balAdmin = await gtContract.balanceOf(owner.address);
             const bal0 = await gtContract.balanceOf(accounts[0].address); //teacher
@@ -123,7 +123,7 @@ describe("NFT Factory Test", function () {
             expect(await TalenMatch.sponsorShare()).to.equal(3000);
             expect(await TalenMatch.teacherShare()).to.equal(4000);
 
-            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0);
+            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
 
             const bal0 = await gtContract.balanceOf(accounts[0].address); //teacher
             const bal1 = await gtContract.balanceOf(accounts[1].address); //teacher
@@ -153,22 +153,22 @@ describe("NFT Factory Test", function () {
 
         it("Admin", async function () {
             const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixtureTalentMatch);
-            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0);
+            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
 
             await expect(
                 TalenMatch.connect(accounts[0]).updateShareScheme(1000, 2000, 3000, 4000)
             ).to.be.revertedWith("admin: wut?");
             await expect(
-                TalenMatch.connect(accounts[0]).addTalentMatch(accounts[11].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0)
+                TalenMatch.connect(accounts[0]).addTalentMatch(accounts[11].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"))
             ).to.be.revertedWith("admin: wut?");
             await expect(
-                TalenMatch.connect(accounts[0]).updateTalentMatch(accounts[5].address, accounts[10].address, accounts[11].address, accounts[12].address, courseNFT.address, 0)
+                TalenMatch.connect(accounts[0]).updateTalentMatch(accounts[5].address, accounts[10].address, accounts[11].address, accounts[12].address, courseNFT.address, 0, ethers.utils.parseEther("100"))
             ).to.be.revertedWith("admin: wut?");
             await expect(
                 TalenMatch.connect(accounts[0]).deleteTalentMatch(accounts[5].address)
             ).to.be.revertedWith("admin: wut?");
             await expect(
-                TalenMatch.connect(accounts[0]).confirmTalentMatch(accounts[5].address, 100000)
+                TalenMatch.connect(accounts[0]).confirmTalentMatch(accounts[5].address, ethers.utils.parseEther("100"))
             ).to.be.revertedWith("admin: wut?");
 
             await TalenMatch.connect(owner).setAdmin(accounts[0].address, true);
@@ -185,21 +185,21 @@ describe("NFT Factory Test", function () {
         it("Emits Add Match Event", async function () {
             const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixtureTalentMatch);
             await expect(
-                TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0)
+                TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"))
             ).to.emit(courseTokenEvent, "TalentMatchAdded").withArgs(anyValue, accounts[5].address);
         });
 
         it("Emits Update Match Event", async function () {
             const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixtureTalentMatch);
-            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0);
+            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
             await expect(
-                TalenMatch.updateTalentMatch(accounts[5].address, accounts[6].address, accounts[10].address, accounts[8].address, courseNFT.address, 0)
+                TalenMatch.updateTalentMatch(accounts[5].address, accounts[6].address, accounts[10].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"))
             ).to.emit(courseTokenEvent, "TalentMatchUpdated").withArgs(anyValue, accounts[5].address);
         });
 
         it("Emits Delete Match Event", async function () {
             const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixtureTalentMatch);
-            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0);
+            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
             await expect(
                 TalenMatch.deleteTalentMatch(accounts[5].address)
             ).to.emit(courseTokenEvent, "TalentMatchDeleted").withArgs(anyValue, accounts[5].address);
@@ -207,11 +207,11 @@ describe("NFT Factory Test", function () {
 
         it("Emits Confirm Match Event", async function () {
             const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixtureTalentMatch);
-            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0);
-            await gtContract.approve(TalenMatch.address, ethers.utils.parseEther("50"));
+            await TalenMatch.addTalentMatch(accounts[5].address, accounts[6].address, accounts[7].address, accounts[8].address, courseNFT.address, 0, ethers.utils.parseEther("100"));
+            await gtContract.approve(TalenMatch.address, ethers.utils.parseEther("100"));
             await expect(
-                TalenMatch.confirmTalentMatch(accounts[5].address, ethers.utils.parseEther("50"))
-            ).to.emit(courseTokenEvent, "TalentMatchConfirmed").withArgs(anyValue, accounts[5].address, ethers.utils.parseEther("50"));
+                TalenMatch.confirmTalentMatch(accounts[5].address, ethers.utils.parseEther("100"))
+            ).to.emit(courseTokenEvent, "TalentMatchConfirmed").withArgs(anyValue, accounts[5].address, ethers.utils.parseEther("100"));
         });
 
         it("Emits Share Scheme Updated Event", async function () {

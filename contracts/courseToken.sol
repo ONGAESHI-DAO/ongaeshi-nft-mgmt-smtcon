@@ -175,20 +175,21 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     function returnToken(
         uint256 _tokenId,
-        uint256 _repairCost
+        uint256 _repairCost,
+        bool _isCancel
     ) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
         require(isLended[_tokenId], "Token not on loan");
         isLended[_tokenId] = false;
-        breakToken(_tokenId, _repairCost);
+        breakToken(_tokenId, _repairCost, _isCancel);
     }
 
-    function breakToken(uint256 _tokenId, uint256 _repairCost) internal {
+    function breakToken(uint256 _tokenId, uint256 _repairCost, bool _isCancel) internal {
         require(_exists(_tokenId), "Token does not exists");
         require(repairCost[_tokenId] == 0, "Token already needs repair");
         if (_repairCost > 0) {
             repairCost[_tokenId] = _repairCost;
-            xEmitEvent.NeedRepairEvent(address(this), _tokenId, _repairCost);
+            xEmitEvent.NeedRepairEvent(address(this), _tokenId, _repairCost, _isCancel);
         }
     }
 
