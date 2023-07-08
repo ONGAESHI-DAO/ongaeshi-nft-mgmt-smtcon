@@ -78,7 +78,9 @@ contract TalentMatch is OwnableUpgradeable {
         address _teacher,
         address _nftAddress,
         uint256 _tokenId,
-        uint256 _amount
+        uint256 _amount,
+        uint256 _matchDate,
+        uint256 _payDate
     ) external onlyAdmin {
         require(
             matchRegistry[_talent].nftAddress == address(0),
@@ -91,9 +93,12 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.nftAddress = _nftAddress;
         newMatch.tokenId = _tokenId;
         newMatch.amount = _amount;
-
+        newMatch.matchDate = _matchDate;
+        newMatch.payDate = _payDate;
+        
         matchRegistry[_talent] = newMatch;
-        xEmitEvent.TalentMatchAddedEvent(newMatch, _talent);
+        xEmitEvent.TalentMatchAddedEvent(newMatch, _talent, _amount);
+        
     }
 
     function updateTalentMatch(
@@ -103,7 +108,9 @@ contract TalentMatch is OwnableUpgradeable {
         address _teacher,
         address _nftAddress,
         uint256 _tokenId,
-        uint256 _amount
+        uint256 _amount,
+        uint256 _matchDate,
+        uint256 _payDate
     ) external onlyAdmin {
         require(
             matchRegistry[_talent].nftAddress != address(0),
@@ -116,9 +123,12 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.nftAddress = _nftAddress;
         newMatch.tokenId = _tokenId;
         newMatch.amount = _amount;
-
+        newMatch.matchDate = _matchDate;
+        newMatch.payDate = _payDate;
+        
         matchRegistry[_talent] = newMatch;
-        xEmitEvent.TalentMatchUpdatedEvent(newMatch, _talent);
+        xEmitEvent.TalentMatchUpdatedEvent(newMatch, _talent, _amount);
+        
     }
 
     function deleteTalentMatch(address _talent) external onlyAdmin {

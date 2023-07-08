@@ -51,7 +51,8 @@ contract CourseTokenEvent is OwnableUpgradeable {
     );
     event TalentMatchAdded(
         OGSLib.MatchData newMatch,
-        address indexed talentAddr
+        address indexed talentAddr,
+        uint256 amount
     );
     event TalentMatchConfirmed(
         OGSLib.MatchData existingMatch,
@@ -60,7 +61,8 @@ contract CourseTokenEvent is OwnableUpgradeable {
     );
     event TalentMatchUpdated(
         OGSLib.MatchData existingMatch,
-        address indexed talentAddr
+        address indexed talentAddr,
+        uint256 amount
     );
     event TalentMatchDeleted(
         OGSLib.MatchData existingMatch,
@@ -79,7 +81,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
         bool isCancel
     );
     event Repaired(address indexed courseAddress, uint256 indexed tokenId);
-    event TokenLended(address indexed courseAddress, uint256 indexed tokenId);
+    event TokenLended(address indexed courseAddress, uint256 indexed tokenId, address destiny);
 
     function initialize() external initializer {
         __Ownable_init();
@@ -102,9 +104,10 @@ contract CourseTokenEvent is OwnableUpgradeable {
 
     function TalentMatchAddedEvent(
         OGSLib.MatchData memory _newMatch,
-        address _talentAddr
+        address _talentAddr, 
+        uint256 _amount
     ) external onlyExecutor {
-        emit TalentMatchAdded(_newMatch, _talentAddr);
+        emit TalentMatchAdded(_newMatch, _talentAddr, _amount);
     }
 
     function TalentMatchConfirmedEvent(
@@ -124,9 +127,10 @@ contract CourseTokenEvent is OwnableUpgradeable {
 
     function TalentMatchUpdatedEvent(
         OGSLib.MatchData calldata _match,
-        address _talentAddr
+        address _talentAddr,
+        uint256 _amount
     ) external onlyExecutor {
-        emit TalentMatchUpdated(_match, _talentAddr);
+        emit TalentMatchUpdated(_match, _talentAddr, _amount);
     }
 
     function TokenMintEvent(
@@ -214,9 +218,10 @@ contract CourseTokenEvent is OwnableUpgradeable {
 
     function TokenLendedEvent(
         address _courseAddress,
-        uint256 _tokenId
+        uint256 _tokenId,
+        address destiny
     ) external onlyExecutor {
-        emit TokenLended(_courseAddress, _tokenId);
+        emit TokenLended(_courseAddress, _tokenId, destiny);
     }
 
     // Support multiple wallets or address as admin

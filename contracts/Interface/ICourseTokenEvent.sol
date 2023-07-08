@@ -12,15 +12,15 @@ interface ICourseTokenEvent {
 	function CourseDeployedEvent(address _courseAddress, address _sender) external;
 	function TeacherPaidEvent(address _courseAddress, OGSLib.TeacherShare[] calldata _teachers, uint256 _totalamount) external;
 	function TeacherAddedEvent(address _courseAddress, OGSLib.TeacherShare[] calldata _teachers) external;
-	function TalentMatchAddedEvent(OGSLib.MatchData memory _newMatch, address _talentAddr) external;
+	function TalentMatchAddedEvent(OGSLib.MatchData memory _newMatch, address _talentAddr, uint256 _amount) external;
 	function TalentMatchConfirmedEvent(OGSLib.MatchData memory _match, address _talentAddr, uint256 _amount) external;
 	function TalentMatchDeletedEvent(OGSLib.MatchData memory _match, address _talentAddr) external;
-	function TalentMatchUpdatedEvent(OGSLib.MatchData calldata _match, address _talentAddr) external;
+	function TalentMatchUpdatedEvent(OGSLib.MatchData calldata _match, address _talentAddr, uint256 _amount) external;
 	function ShareSchemeUpdatedEvent(uint256 _talentShare, uint256 _coachShare, uint256 _sponsorShare, uint256 _teacherShare) external;
 	function setExecutor(address _address, bool _allow) external;
 	function NeedRepairEvent(address _courseAddress, uint256 _tokenId, uint256 _repairCost, bool _isCancel) external;
     function RepairedEvent(address _courseAddress, uint256 _tokenId) external;
-	function TokenLendedEvent(address _courseAddress, uint256 _tokenId) external;
+	function TokenLendedEvent(address _courseAddress, uint256 _tokenId, address destiny) external;
 }
 
 
