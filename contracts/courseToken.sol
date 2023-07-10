@@ -42,7 +42,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         address _tokenAddr,
         address _emitEventAddr
     ) external initializer {
-        require(_treasury != address(0), "_teacher is zero");
+        require(_treasury != address(0), "_treasury is zero");
         require(_tokenAddr != address(0), "_tokenAddr is zero");
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         require(_supplyLimit > 0, "_supplyLimit is zero");
