@@ -14,5 +14,7 @@ library OGSLib {
         address nftAddress;
         uint256 tokenId;
         uint256 amount;
+        uint256 matchDate;
+        uint256 payDate;
     }
 }
