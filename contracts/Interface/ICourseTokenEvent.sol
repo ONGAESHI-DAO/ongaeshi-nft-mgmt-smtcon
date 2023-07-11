@@ -21,6 +21,10 @@ interface ICourseTokenEvent {
 	function NeedRepairEvent(address _courseAddress, uint256 _tokenId, uint256 _repairCost, bool _isCancel) external;
     function RepairedEvent(address _courseAddress, uint256 _tokenId) external;
 	function TokenLendedEvent(address _courseAddress, uint256 _tokenId, address destiny) external;
+    function ListingCreatedEvent(address _courseAddress, uint256 _tokenId, address _lister, uint256 _price) external;
+    function ListingUpdatedEvent(address _courseAddress, uint256 _tokenId, uint256 _oldPrice, uint256 _newPrice) external;
+    function ListingDeletedEvent(address _courseAddress, uint256 _tokenId) external;
+    function ListingPurchasedEvent(address _courseAddress, uint256 _tokenId, address _buyer, uint256 _price) external;
 }
 
 

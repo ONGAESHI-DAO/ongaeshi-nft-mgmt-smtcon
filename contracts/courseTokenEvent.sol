@@ -81,7 +81,33 @@ contract CourseTokenEvent is OwnableUpgradeable {
         bool isCancel
     );
     event Repaired(address indexed courseAddress, uint256 indexed tokenId);
-    event TokenLended(address indexed courseAddress, uint256 indexed tokenId, address destiny);
+    event TokenLended(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        address destiny
+    );
+    event ListingCreated(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        address lister,
+        uint256 price
+    );
+    event ListingUpdated(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        uint256 oldPrice,
+        uint256 newPrice
+    );
+    event ListingDeleted(
+        address indexed courseAddress,
+        uint256 indexed tokenId
+    );
+    event ListingPurchased(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        address buyer,
+        uint256 price
+    );
 
     function initialize() external initializer {
         __Ownable_init();
@@ -104,7 +130,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
 
     function TalentMatchAddedEvent(
         OGSLib.MatchData memory _newMatch,
-        address _talentAddr, 
+        address _talentAddr,
         uint256 _amount
     ) external onlyExecutor {
         emit TalentMatchAdded(_newMatch, _talentAddr, _amount);
@@ -222,6 +248,40 @@ contract CourseTokenEvent is OwnableUpgradeable {
         address destiny
     ) external onlyExecutor {
         emit TokenLended(_courseAddress, _tokenId, destiny);
+    }
+
+    function ListingCreatedEvent(
+        address _courseAddress,
+        uint256 _tokenId,
+        address _lister,
+        uint256 _price
+    ) external onlyExecutor {
+        emit ListingCreated(_courseAddress, _tokenId, _lister, _price);
+    }
+
+    function ListingUpdatedEvent(
+        address _courseAddress,
+        uint256 _tokenId,
+        uint256 _oldPrice,
+        uint256 _newPrice
+    ) external onlyExecutor {
+        emit ListingUpdated(_courseAddress, _tokenId, _oldPrice, _newPrice);
+    }
+
+    function ListingDeletedEvent(
+        address _courseAddress,
+        uint256 _tokenId
+    ) external onlyExecutor {
+        emit ListingDeleted(_courseAddress, _tokenId);
+    }
+
+    function ListingPurchasedEvent(
+        address _courseAddress,
+        uint256 _tokenId,
+        address _buyer,
+        uint256 _price
+    ) external onlyExecutor {
+        emit ListingPurchased(_courseAddress, _tokenId, _buyer, _price);
     }
 
     // Support multiple wallets or address as admin

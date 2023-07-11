@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./Interface/ICourseToken.sol";
+import "./Interface/ICourseTokenEvent.sol";
 import "./OGSLib.sol";
 
 contract CourseToken is OwnableUpgradeable {
@@ -19,6 +20,8 @@ contract CourseToken is OwnableUpgradeable {
     }
     mapping(address => mapping(uint256 => Listing)) public listingMap;
     Listing[] public listings;
+
+    ICourseTokenEvent public xEmitEvent;
     address public treasury;
     uint256 public treasuryCommission;
     uint256 public teacherCommission;
@@ -28,7 +31,8 @@ contract CourseToken is OwnableUpgradeable {
         address _gtAddress,
         address _treasury,
         uint256 _treasuryCommission,
-        uint256 _teacherCommission
+        uint256 _teacherCommission,
+        address _emitEventAddr
     ) external initializer {
         require(_treasury != address(0), "_treasury is zero");
         require(_gtAddress != address(0), "_gtAddress is zero");
@@ -36,6 +40,7 @@ contract CourseToken is OwnableUpgradeable {
         treasury = _treasury;
         treasuryCommission = _treasuryCommission;
         teacherCommission = _teacherCommission;
+        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }
 
     function createListing(
@@ -72,7 +77,12 @@ contract CourseToken is OwnableUpgradeable {
         listings.push(newListing);
         listingMap[_tokenAddress][_tokenId] = newListing;
 
-        // emit event
+        xEmitEvent.ListingCreatedEvent(
+            _tokenAddress,
+            _tokenId,
+            msg.sender,
+            _amount
+        );
     }
 
     function cancelListing(address _tokenAddress, uint256 _tokenId) external {
@@ -98,7 +108,7 @@ contract CourseToken is OwnableUpgradeable {
             _tokenId
         );
 
-        // emit event
+        xEmitEvent.ListingDeletedEvent(_tokenAddress, _tokenId);
     }
 
     function updateListing(
@@ -116,7 +126,12 @@ contract CourseToken is OwnableUpgradeable {
         listingMap[_tokenAddress][_tokenId].price = _amount;
         listings[toBeUpdatedListing.index].price = _amount;
 
-        // emit event
+        xEmitEvent.ListingUpdatedEvent(
+            _tokenAddress,
+            _tokenId,
+            toBeUpdatedListing.price,
+            _amount
+        );
     }
 
     function buyListing(address _tokenAddress, uint256 _tokenId) external {
@@ -163,7 +178,12 @@ contract CourseToken is OwnableUpgradeable {
             _tokenId
         );
 
-        // emit event
+        xEmitEvent.ListingPurchasedEvent(
+            _tokenAddress,
+            _tokenId,
+            msg.sender,
+            toBeRemovedListing.price
+        );
     }
 
     function getAllListings() external view returns (Listing[] memory) {
