@@ -54,14 +54,17 @@ async function deployTestEnvFixtureTalentMatch() {
     const courseTokenDeployer = await ethers.getContractFactory("CourseToken");
     const courseTokenFactoryDeployer = await ethers.getContractFactory('CourseTokenFactory');
     const talentMatchDeployer = await ethers.getContractFactory('TalentMatch');
+    const nftMarketplaceDeployer = await ethers.getContractFactory('NFTMarketplace');
 
     const gtContract = await GTFactory.deploy();
     const courseTokenEvent = await upgrades.deployProxy(courseTokenEventDeployer);
     const courseTokenBeacon = await upgrades.deployBeacon(courseTokenDeployer);
     const courseFactory = await upgrades.deployProxy(courseTokenFactoryDeployer, [courseTokenBeacon.address, gtContract.address, courseTokenEvent.address]);
     const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 2000, 3000, 3000, 2000, courseTokenEvent.address]);
+    const NFTMarketplace = await upgrades.deployProxy(nftMarketplaceDeployer, [gtContract.address, accounts[9].address, 2000, 3000, courseTokenEvent.address]);
     await courseTokenEvent.setExecutor(courseFactory.address, true);
     await courseTokenEvent.setExecutor(TalenMatch.address, true);
+    await courseTokenEvent.setExecutor(NFTMarketplace.address, true);
 
     // give accounts some GT
     for (let i = 0; i < 5; i++) {
@@ -86,7 +89,7 @@ async function deployTestEnvFixtureTalentMatch() {
     const courseNFT = await courseTokenDeployer.attach(await courseFactory.deployedAddresses(0));
     await courseNFT.addTeacherShares(defaultTeacherShares);
     await courseNFT.mintByAdmin(3, accounts[8].address);
-    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares };
+    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, NFTMarketplace, owner, accounts, defaultTeacherShares };
 }
 
 module.exports = {

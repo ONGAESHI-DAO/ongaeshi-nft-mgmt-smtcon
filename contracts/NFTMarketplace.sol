@@ -3,12 +3,13 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./Interface/ICourseToken.sol";
 import "./Interface/ICourseTokenEvent.sol";
 import "./OGSLib.sol";
 
-contract CourseToken is OwnableUpgradeable {
+contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     struct Listing {
@@ -27,6 +28,7 @@ contract CourseToken is OwnableUpgradeable {
     uint256 public teacherCommission;
     address public gtAddress;
 
+    event Received(address, address, uint256);
     function initialize(
         address _gtAddress,
         address _treasury,
@@ -36,6 +38,8 @@ contract CourseToken is OwnableUpgradeable {
     ) external initializer {
         require(_treasury != address(0), "_treasury is zero");
         require(_gtAddress != address(0), "_gtAddress is zero");
+
+        __Ownable_init();
         gtAddress = _gtAddress;
         treasury = _treasury;
         treasuryCommission = _treasuryCommission;
@@ -184,6 +188,17 @@ contract CourseToken is OwnableUpgradeable {
             msg.sender,
             toBeRemovedListing.price
         );
+    }
+
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    ) external override returns (bytes4) {
+        data;
+        emit Received(operator, from, tokenId);
+        return  0x150b7a02;
     }
 
     function getAllListings() external view returns (Listing[] memory) {
