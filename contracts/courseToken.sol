@@ -11,7 +11,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using StringsUpgradeable for uint256;
 
-    mapping(uint256 => bool) public isLended;
+    mapping(uint256 => address) public isLended;
     mapping(uint256 => uint256) public repairCost;
     mapping(uint256 => string) public tokenCID;
     mapping(address => bool) public admins;
@@ -89,7 +89,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             treasury,
             treasuryCut
         );
-        for (uint256 i = 0; i < _amount; i++) {
+        for (uint256 i = 1; i <= _amount; i++) {
             _mint(msg.sender, currSupply + i);
             xEmitEvent.TokenMintEvent(
                 address(this),
@@ -111,7 +111,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             currSupply + _amount <= supplyLimit,
             "Mint request exceeds supply limit"
         );
-        for (uint256 i = 0; i < _amount; i++) {
+        for (uint256 i = 1; i <= _amount; i++) {
             _mint(_recipient, currSupply + i);
             xEmitEvent.TokenMintEvent(
                 address(this),
@@ -166,29 +166,40 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         supplyLimit = newSupply;
     }
 
-    function lendToken(uint256 _tokenId) external onlyAdmin {
+    function lendToken(uint256 _tokenId, address destiny) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
-        require(!isLended[_tokenId], "Token already lended");
+        require(isLended[_tokenId] == address(0), "Token already lended");
         require(repairCost[_tokenId] == 0, "Token needs repair");
-        isLended[_tokenId] = true;
+        isLended[_tokenId] = destiny;
+        xEmitEvent.TokenLendedEvent(address(this), _tokenId, destiny);
     }
 
     function returnToken(
         uint256 _tokenId,
-        uint256 _repairCost
+        uint256 _repairCost,
+        bool _isCancel
     ) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
-        require(isLended[_tokenId], "Token not on loan");
-        isLended[_tokenId] = false;
-        breakToken(_tokenId, _repairCost);
+        require(isLended[_tokenId] != address(0), "Token not on loan");
+        isLended[_tokenId] = address(0);
+        breakToken(_tokenId, _repairCost, _isCancel);
     }
 
-    function breakToken(uint256 _tokenId, uint256 _repairCost) internal {
+    function breakToken(
+        uint256 _tokenId,
+        uint256 _repairCost,
+        bool _isCancel
+    ) internal {
         require(_exists(_tokenId), "Token does not exists");
         require(repairCost[_tokenId] == 0, "Token already needs repair");
         if (_repairCost > 0) {
             repairCost[_tokenId] = _repairCost;
-            xEmitEvent.NeedRepairEvent(address(this), _tokenId, _repairCost);
+            xEmitEvent.NeedRepairEvent(
+                address(this),
+                _tokenId,
+                _repairCost,
+                _isCancel
+            );
         }
     }
 

@@ -8,12 +8,14 @@ async function deployTestEnvFixture() {
     const courseTokenDeployer = await ethers.getContractFactory("CourseToken");
     const courseTokenFactoryDeployer = await ethers.getContractFactory('CourseTokenFactory');
     const talentMatchDeployer = await ethers.getContractFactory('TalentMatch');
+    const airdropDeployer = await hre.ethers.getContractFactory('Airdrop');
 
     const gtContract = await GTFactory.deploy();
     const courseTokenEvent = await upgrades.deployProxy(courseTokenEventDeployer);
     const courseTokenBeacon = await upgrades.deployBeacon(courseTokenDeployer);
     const courseFactory = await upgrades.deployProxy(courseTokenFactoryDeployer, [courseTokenBeacon.address, gtContract.address, courseTokenEvent.address]);
     const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 2000, 3000, 3000, 2000, courseTokenEvent.address]);
+    const airdrop = await airdropDeployer.deploy(gtContract.address);
     await courseTokenEvent.setExecutor(courseFactory.address, true);
     await courseTokenEvent.setExecutor(TalenMatch.address, true);
 
@@ -39,7 +41,7 @@ async function deployTestEnvFixture() {
     await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address);
     const courseNFT = await courseTokenDeployer.attach(await courseFactory.deployedAddresses(0));
     await courseNFT.addTeacherShares(defaultTeacherShares);
-    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares };
+    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares, airdrop};
 }
 
 async function deployTestEnvFixtureTalentMatch() {

@@ -7,6 +7,7 @@ async function main() {
     const courseTokenDeployer = await hre.ethers.getContractFactory("CourseToken");
     const courseTokenFactoryDeployer = await hre.ethers.getContractFactory('CourseTokenFactory');
     const talentMatchDeployer = await hre.ethers.getContractFactory('TalentMatch');
+    const airdropDeployer = await hre.ethers.getContractFactory('Airdrop');
 
     const gtContract = await GTFactory.deploy();
     await gtContract.deployed();
@@ -34,6 +35,10 @@ async function main() {
     txn = await courseTokenEvent.setExecutor(TalenMatch.address, true);
     await txn.wait();
     console.log("Done setExecutor to TalenMatch");
+
+    const airdrop = await airdropDeployer.deploy(gtContract.address);
+    console.log("deployed GT: ", airdrop.address);
+
 }
 
 
