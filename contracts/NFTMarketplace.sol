@@ -201,6 +201,10 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         return  0x150b7a02;
     }
 
+    function getListing(address _tokenAddress, uint256 _tokenId) external view returns (Listing memory) {
+        return listingMap[_tokenAddress][_tokenId];
+    }
+
     function getAllListings() external view returns (Listing[] memory) {
         return listings;
     }

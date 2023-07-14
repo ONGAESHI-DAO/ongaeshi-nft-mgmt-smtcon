@@ -88,7 +88,7 @@ async function deployTestEnvFixtureTalentMatch() {
     await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address);
     const courseNFT = await courseTokenDeployer.attach(await courseFactory.deployedAddresses(0));
     await courseNFT.addTeacherShares(defaultTeacherShares);
-    await courseNFT.mintByAdmin(3, accounts[8].address);
+    await courseNFT.mintByAdmin(5, accounts[8].address);
     return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, NFTMarketplace, owner, accounts, defaultTeacherShares };
 }
 
