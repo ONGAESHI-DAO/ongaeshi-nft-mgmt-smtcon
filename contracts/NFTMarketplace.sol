@@ -20,6 +20,7 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         uint256 index;
     }
     mapping(address => mapping(uint256 => Listing)) public listingMap;
+    mapping(address => bool) public admins;
     Listing[] public listings;
 
     ICourseTokenEvent public xEmitEvent;
@@ -38,6 +39,8 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
     ) external initializer {
         require(_treasury != address(0), "_treasury is zero");
         require(_gtAddress != address(0), "_gtAddress is zero");
+        require(_treasuryCommission <= 30000, "_treasuryCommission cannot exceed 30%");
+        require(_teacherCommission <= 20000, "_teacherCommission cannot exceed 20%");
 
         __Ownable_init();
         gtAddress = _gtAddress;
@@ -45,6 +48,7 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         treasuryCommission = _treasuryCommission;
         teacherCommission = _teacherCommission;
         xEmitEvent = ICourseTokenEvent(_emitEventAddr);
+        admins[msg.sender] = true;
     }
 
     function createListing(
@@ -190,6 +194,21 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         );
     }
 
+    function setTreasury(address _newTreasury) external onlyAdmin {
+        require(_newTreasury != address(0), "newTreasury address 0");
+        treasury = _newTreasury;
+    }
+
+    function setTreasuryCommission(uint256 _newTreasuryCommission) external onlyAdmin {
+        require(_newTreasuryCommission <= 30000, "_newTreasuryCommission cannot exceed 30%");
+        treasuryCommission = _newTreasuryCommission;
+    }
+
+    function setTeacherCommission(uint256 _newTeacherCommission) external onlyAdmin {
+        require(_newTeacherCommission <= 20000, "_newTeacherCommission cannot exceed 20%");
+        teacherCommission = _newTeacherCommission;
+    }
+
     function onERC721Received(
         address operator,
         address from,
@@ -211,5 +230,14 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
 
     function getListingsCount() external view returns (uint256) {
         return listings.length;
+    }
+
+    function setAdmin(address _address, bool _allow) external onlyOwner {
+        admins[_address] = _allow;
+    }
+
+    modifier onlyAdmin() {
+        require(admins[msg.sender], "admin: wut?");
+        _;
     }
 }
