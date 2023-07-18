@@ -39,8 +39,8 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
     ) external initializer {
         require(_treasury != address(0), "_treasury is zero");
         require(_gtAddress != address(0), "_gtAddress is zero");
-        require(_treasuryCommission <= 30000, "_treasuryCommission cannot exceed 30%");
-        require(_teacherCommission <= 20000, "_teacherCommission cannot exceed 20%");
+        require(_treasuryCommission <= 3000, "_treasuryCommission cannot exceed 30%");
+        require(_teacherCommission <= 2000, "_teacherCommission cannot exceed 20%");
 
         __Ownable_init();
         gtAddress = _gtAddress;
@@ -200,12 +200,12 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
     }
 
     function setTreasuryCommission(uint256 _newTreasuryCommission) external onlyAdmin {
-        require(_newTreasuryCommission <= 30000, "_newTreasuryCommission cannot exceed 30%");
+        require(_newTreasuryCommission <= 3000, "_newTreasuryCommission cannot exceed 30%");
         treasuryCommission = _newTreasuryCommission;
     }
 
     function setTeacherCommission(uint256 _newTeacherCommission) external onlyAdmin {
-        require(_newTeacherCommission <= 20000, "_newTeacherCommission cannot exceed 20%");
+        require(_newTeacherCommission <= 2000, "_newTeacherCommission cannot exceed 20%");
         teacherCommission = _newTeacherCommission;
     }
 
