@@ -155,7 +155,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
         uint256 _oldFee,
         uint256 _newFee
     ) external onlyExecutor {
-        emit PriceUpdated(_courseAddress, _oldFee, _newFee);
+        emit FeeUpdated(_courseAddress, _oldFee, _newFee);
     }
 
     function TreasuryUpdatedEvent(
