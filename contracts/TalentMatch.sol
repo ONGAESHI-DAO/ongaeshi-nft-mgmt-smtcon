@@ -33,7 +33,7 @@ contract TalentMatch is OwnableUpgradeable {
         uint64 _teacherShare,
         address _emitEventAddr
     ) public initializer {
-        require(_tokenAddr != address(0), "_tokenAddr is zero");
+        // require(_tokenAddr != address(0), "_tokenAddr is zero");
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         require(
             _talentShare + _coachShare + _sponsorShare + _teacherShare == 10000,
@@ -145,6 +145,7 @@ contract TalentMatch is OwnableUpgradeable {
         OGSLib.MatchData memory matchData = matchRegistry[_talent];
         require(matchData.nftAddress != address(0), "match does not exist");
         require(matchData.amount == _amount, "amount does not match");
+        require(gtAddress != address(0), "GT not available");
         delete matchRegistry[_talent];
 
         IERC20Upgradeable(gtAddress).safeTransferFrom(
@@ -176,6 +177,10 @@ contract TalentMatch is OwnableUpgradeable {
         );
         ICourseToken(matchData.nftAddress).payTeachers(teacherAmount);
         xEmitEvent.TalentMatchConfirmedEvent(matchData, _talent, _amount);
+    }
+
+    function setGTAddress(address _gtAddress) external onlyAdmin {
+        gtAddress = _gtAddress;
     }
 
     function setEmitEvent(address _emitEventAddr) external onlyOwner {

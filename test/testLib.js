@@ -89,7 +89,47 @@ async function deployTestEnvFixtureTalentMatch() {
     return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares };
 }
 
+async function deployTestEnvFixtureWithoutGT() {
+
+    // Contracts are deployed using the first signer/account by default
+    const [owner, ...accounts] = await ethers.getSigners();
+
+    const courseTokenEventDeployer = await ethers.getContractFactory('CourseTokenEvent');
+    const courseTokenDeployer = await ethers.getContractFactory("CourseToken");
+    const courseTokenFactoryDeployer = await ethers.getContractFactory('CourseTokenFactory');
+    const talentMatchDeployer = await ethers.getContractFactory('TalentMatch');
+
+    const courseTokenEvent = await upgrades.deployProxy(courseTokenEventDeployer);
+    const courseTokenBeacon = await upgrades.deployBeacon(courseTokenDeployer);
+    const courseFactory = await upgrades.deployProxy(courseTokenFactoryDeployer, [courseTokenBeacon.address, ethers.constants.AddressZero, courseTokenEvent.address]);
+    const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [ethers.constants.AddressZero, 2000, 3000, 3000, 2000, courseTokenEvent.address]);
+    await courseTokenEvent.setExecutor(courseFactory.address, true);
+    await courseTokenEvent.setExecutor(TalenMatch.address, true);
+
+    const defaultTeacherShares = [
+        {
+            teacher: accounts[0].address,
+            shares: 5000
+        },
+        {
+            teacher: accounts[1].address,
+            shares: 4000
+        },
+        {
+            teacher: accounts[2].address,
+            shares: 1000
+        }
+    ]
+    await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address);
+    const courseNFT = await courseTokenDeployer.attach(await courseFactory.deployedAddresses(0));
+    await courseNFT.addTeacherShares(defaultTeacherShares);
+    await courseNFT.setAdminRepairOnly(true);
+
+    return { courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares};
+}
+
 module.exports = {
     deployTestEnvFixture,
-    deployTestEnvFixtureTalentMatch
+    deployTestEnvFixtureTalentMatch,
+    deployTestEnvFixtureWithoutGT
 };
