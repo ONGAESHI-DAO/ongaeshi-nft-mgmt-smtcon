@@ -25,7 +25,6 @@ contract CourseTokenFactory is OwnableUpgradeable {
     ) external initializer {
         require(_beaconAddress != address(0), "_beaconAddress is zero");
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
-        require(_tokenAddr != address(0), "_tokenAddr is zero");
         beaconAddr = _beaconAddress;
         gtAddress = _tokenAddr;
         xEmitEvent = ICourseTokenEvent(_emitEventAddr);
