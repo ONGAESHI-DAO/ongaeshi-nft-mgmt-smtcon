@@ -69,7 +69,6 @@ contract CourseTokenEvent is OwnableUpgradeable {
         address indexed talentAddr
     );
     event ShareSchemeUpdated(
-        uint256 talentShare,
         uint256 coachShare,
         uint256 sponsorShare,
         uint256 teacherShare
@@ -89,13 +88,11 @@ contract CourseTokenEvent is OwnableUpgradeable {
     }
 
     function ShareSchemeUpdatedEvent(
-        uint256 _talentShare,
         uint256 _coachShare,
         uint256 _sponsorShare,
         uint256 _teacherShare
     ) external onlyExecutor {
         emit ShareSchemeUpdated(
-            _talentShare,
             _coachShare,
             _sponsorShare,
             _teacherShare

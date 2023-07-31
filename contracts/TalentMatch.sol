@@ -11,7 +11,7 @@ contract TalentMatch is OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     address public gtAddress;
-    uint64 public talentShare;
+    address public treasuryAddress;
     uint64 public coachShare;
     uint64 public sponsorShare;
     uint64 public teacherShare;
@@ -27,21 +27,23 @@ contract TalentMatch is OwnableUpgradeable {
 
     function initialize(
         address _tokenAddr,
-        uint64 _talentShare,
         uint64 _coachShare,
         uint64 _sponsorShare,
         uint64 _teacherShare,
-        address _emitEventAddr
+        address _emitEventAddr,
+        address _treasuryAddress
     ) public initializer {
         // require(_tokenAddr != address(0), "_tokenAddr is zero");
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
+        require(_treasuryAddress != address(0), "_treasuryAddress is zero");
         require(
-            _talentShare + _coachShare + _sponsorShare + _teacherShare == 10000,
+            _coachShare + _sponsorShare + _teacherShare ==
+                10000,
             "Shares do not sum to 10000"
         );
         __Ownable_init();
         gtAddress = _tokenAddr;
-        talentShare = _talentShare;
+        treasuryAddress = _treasuryAddress;
         coachShare = _coachShare;
         sponsorShare = _sponsorShare;
         teacherShare = _teacherShare;
@@ -50,21 +52,19 @@ contract TalentMatch is OwnableUpgradeable {
     }
 
     function updateShareScheme(
-        uint64 _talentShare,
         uint64 _coachShare,
         uint64 _sponsorShare,
         uint64 _teacherShare
     ) external onlyAdmin {
         require(
-            _talentShare + _coachShare + _sponsorShare + _teacherShare == 10000,
+            _coachShare + _sponsorShare + _teacherShare ==
+                10000,
             "Shares do not sum to 10000"
         );
-        talentShare = _talentShare;
         coachShare = _coachShare;
         sponsorShare = _sponsorShare;
         teacherShare = _teacherShare;
         xEmitEvent.ShareSchemeUpdatedEvent(
-            _talentShare,
             _coachShare,
             _sponsorShare,
             _teacherShare
@@ -95,10 +95,9 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.amount = _amount;
         newMatch.matchDate = _matchDate;
         newMatch.payDate = _payDate;
-        
+
         matchRegistry[_talent] = newMatch;
         xEmitEvent.TalentMatchAddedEvent(newMatch, _talent, _amount);
-        
     }
 
     function updateTalentMatch(
@@ -125,10 +124,9 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.amount = _amount;
         newMatch.matchDate = _matchDate;
         newMatch.payDate = _payDate;
-        
+
         matchRegistry[_talent] = newMatch;
         xEmitEvent.TalentMatchUpdatedEvent(newMatch, _talent, _amount);
-        
     }
 
     function deleteTalentMatch(address _talent) external onlyAdmin {
@@ -148,21 +146,35 @@ contract TalentMatch is OwnableUpgradeable {
         require(gtAddress != address(0), "GT not available");
         delete matchRegistry[_talent];
 
-        IERC20Upgradeable(gtAddress).safeTransferFrom(
-            msg.sender,
-            _talent,
-            (_amount * talentShare) / 10000
-        );
-        IERC20Upgradeable(gtAddress).safeTransferFrom(
-            msg.sender,
-            matchData.coach,
-            (_amount * coachShare) / 10000
-        );
-        IERC20Upgradeable(gtAddress).safeTransferFrom(
-            msg.sender,
-            matchData.sponsor,
-            (_amount * sponsorShare) / 10000
-        );
+        uint64 actualTreasuryShare = 0;
+
+        if (matchData.sponsor != _talent) {
+            IERC20Upgradeable(gtAddress).safeTransferFrom(
+                msg.sender,
+                matchData.sponsor,
+                (_amount * sponsorShare) / 10000
+            );
+        } else {
+            actualTreasuryShare += sponsorShare;
+        }
+
+        if (matchData.coach != address(0)) {
+            IERC20Upgradeable(gtAddress).safeTransferFrom(
+                msg.sender,
+                matchData.coach,
+                (_amount * coachShare) / 10000
+            );
+        } else {
+            actualTreasuryShare += coachShare;
+        }
+
+        if (actualTreasuryShare > 0) {
+            IERC20Upgradeable(gtAddress).safeTransferFrom(
+                msg.sender,
+                treasuryAddress,
+                (_amount * actualTreasuryShare) / 10000
+            );
+        }
 
         uint256 teacherAmount = (_amount * teacherShare) / 10000;
 
@@ -181,6 +193,11 @@ contract TalentMatch is OwnableUpgradeable {
 
     function setGTAddress(address _gtAddress) external onlyAdmin {
         gtAddress = _gtAddress;
+    }
+
+    function setTreasuryAddress(address _treasuryAddress) external onlyAdmin {
+        require(_treasuryAddress != address(0), "_treasuryAddress is zero");
+        treasuryAddress = _treasuryAddress;
     }
 
     function setEmitEvent(address _emitEventAddr) external onlyOwner {
