@@ -14,7 +14,7 @@ async function deployTestEnvFixture() {
     const courseTokenEvent = await upgrades.deployProxy(courseTokenEventDeployer);
     const courseTokenBeacon = await upgrades.deployBeacon(courseTokenDeployer);
     const courseFactory = await upgrades.deployProxy(courseTokenFactoryDeployer, [courseTokenBeacon.address, gtContract.address, courseTokenEvent.address]);
-    const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 2000, 3000, 3000, 2000, courseTokenEvent.address]);
+    const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 3000, 3000, 4000, courseTokenEvent.address, accounts[9].address]);
     const airdrop = await airdropDeployer.deploy(gtContract.address);
     await courseTokenEvent.setExecutor(courseFactory.address, true);
     await courseTokenEvent.setExecutor(TalenMatch.address, true);
@@ -59,7 +59,7 @@ async function deployTestEnvFixtureTalentMatch() {
     const courseTokenEvent = await upgrades.deployProxy(courseTokenEventDeployer);
     const courseTokenBeacon = await upgrades.deployBeacon(courseTokenDeployer);
     const courseFactory = await upgrades.deployProxy(courseTokenFactoryDeployer, [courseTokenBeacon.address, gtContract.address, courseTokenEvent.address]);
-    const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 2000, 3000, 3000, 2000, courseTokenEvent.address]);
+    const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 3000, 3000, 4000, courseTokenEvent.address, accounts[9].address]);
     await courseTokenEvent.setExecutor(courseFactory.address, true);
     await courseTokenEvent.setExecutor(TalenMatch.address, true);
 
@@ -102,7 +102,7 @@ async function deployTestEnvFixtureWithoutGT() {
     const courseTokenEvent = await upgrades.deployProxy(courseTokenEventDeployer);
     const courseTokenBeacon = await upgrades.deployBeacon(courseTokenDeployer);
     const courseFactory = await upgrades.deployProxy(courseTokenFactoryDeployer, [courseTokenBeacon.address, ethers.constants.AddressZero, courseTokenEvent.address]);
-    const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [ethers.constants.AddressZero, 2000, 3000, 3000, 2000, courseTokenEvent.address]);
+    const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [ethers.constants.AddressZero, 3000, 3000, 4000, courseTokenEvent.address, accounts[9].address]);
     await courseTokenEvent.setExecutor(courseFactory.address, true);
     await courseTokenEvent.setExecutor(TalenMatch.address, true);
 

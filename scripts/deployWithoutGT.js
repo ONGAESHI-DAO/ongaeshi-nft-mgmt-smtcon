@@ -1,6 +1,6 @@
 const hre = require("hardhat");
 
-async function main() {
+async function main(treasuryAddress) {
     
     const courseTokenEventDeployer = await hre.ethers.getContractFactory('CourseTokenEvent');
     const courseTokenDeployer = await hre.ethers.getContractFactory("CourseToken");
@@ -19,7 +19,7 @@ async function main() {
     await courseFactory.deployed();
     console.log("deployed TokenFactory: ", courseFactory.address);
 
-    const TalenMatch = await hre.upgrades.deployProxy(talentMatchDeployer, [hre.ethers.constants.AddressZero, 2000, 3000, 3000, 2000, courseTokenEvent.address]);
+    const TalenMatch = await hre.upgrades.deployProxy(talentMatchDeployer, [hre.ethers.constants.AddressZero, 2000, 3000, 3000, 2000, courseTokenEvent.address, treasuryAddress]);
     await TalenMatch.deployed();
     console.log("deployed TalenMatch: ", TalenMatch.address);
 
@@ -32,5 +32,5 @@ async function main() {
 
 }
 
-
-main();
+const treasuryAddress = "0x821f3361D454cc98b7555221A06Be563a7E2E0A6"
+main(treasuryAddress);
