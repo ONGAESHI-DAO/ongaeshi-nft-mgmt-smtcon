@@ -12,6 +12,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     using StringsUpgradeable for uint256;
 
     mapping(uint256 => address) public isLended;
+    mapping(uint256 => bool) public needRepairMap;
     mapping(uint256 => uint256) public repairCost;
     mapping(uint256 => string) public tokenCID;
     mapping(address => bool) public admins;
@@ -23,11 +24,19 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     address public gtAddress;
     address public treasury;
     uint256 public treasuryFee;
+    bool public transferEnabled;
+    bool public adminRepairOnly;
+
     OGSLib.TeacherShare[] private teacherShares;
     ICourseTokenEvent public xEmitEvent;
 
     modifier onlyAdmin() {
         require(admins[msg.sender], "admin: wut?");
+        _;
+    }
+
+    modifier onlyEnabled() {
+        require(transferEnabled, "Transfers have been disabled for this NFT");
         _;
     }
 
@@ -42,8 +51,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         address _tokenAddr,
         address _emitEventAddr
     ) external initializer {
-        require(_treasury != address(0), "_treasury is zero");
-        require(_tokenAddr != address(0), "_tokenAddr is zero");
+        require(_treasury != address(0), "_teacher is zero");
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         require(_supplyLimit > 0, "_supplyLimit is zero");
         __Ownable_init();
@@ -56,6 +64,8 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         gtAddress = _tokenAddr;
         xEmitEvent = ICourseTokenEvent(_emitEventAddr);
         admins[msg.sender] = true;
+        transferEnabled = false;
+        adminRepairOnly = false;
     }
 
     function addTeacherShares(
@@ -76,6 +86,8 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
 
     function mint(uint256 _amount) external {
         require(teacherShares.length > 0, "teacherShares not initialized");
+        require(price > 0, "This nft cannot be minted by public");
+        require(gtAddress != address(0), "GT not available");
         uint256 currSupply = currentSupply;
         require(
             currSupply + _amount <= supplyLimit,
@@ -191,22 +203,24 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         bool _isCancel
     ) internal {
         require(_exists(_tokenId), "Token does not exists");
-        require(repairCost[_tokenId] == 0, "Token already needs repair");
-        if (_repairCost > 0) {
-            repairCost[_tokenId] = _repairCost;
-            xEmitEvent.NeedRepairEvent(
-                address(this),
-                _tokenId,
-                _repairCost,
-                _isCancel
-            );
-        }
+        require(!needRepairMap[_tokenId], "Token already needs repair");
+        needRepairMap[_tokenId] = true;
+        repairCost[_tokenId] = _repairCost;
+        xEmitEvent.NeedRepairEvent(
+            address(this),
+            _tokenId,
+            _repairCost,
+            _isCancel
+        );
     }
 
     function repairToken(uint256 _tokenId) external {
+        bool needRepair = needRepairMap[_tokenId];
         uint256 nftRepairCost = repairCost[_tokenId];
         require(_exists(_tokenId), "Token does not exists");
-        require(nftRepairCost > 0, "Token does not need repair");
+        require(needRepair, "Token does not need repair");
+        require(!adminRepairOnly, "Can only be repaired by admin");
+        require(gtAddress != address(0), "GT not available");
         delete repairCost[_tokenId];
 
         uint256 treasuryCut = (nftRepairCost * treasuryFee) / 10000;
@@ -220,10 +234,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     }
 
     function repairTokenByAdmin(uint256 _tokenId) external onlyAdmin {
-        uint256 nftRepairCost = repairCost[_tokenId];
+        bool needRepair = needRepairMap[_tokenId];
         require(_exists(_tokenId), "Token does not exists");
-        require(nftRepairCost > 0, "Token does not need repair");
+        require(needRepair, "Token does not need repair");
         delete repairCost[_tokenId];
+        delete needRepairMap[_tokenId];
         xEmitEvent.RepairedEvent(address(this), _tokenId);
     }
 
@@ -268,8 +283,21 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         }
     }
 
+    function setAdminRepairOnly(bool _allow) external onlyAdmin {
+        adminRepairOnly = _allow;
+    }
+
+    function setTransferEnabled(bool _allow) external onlyAdmin {
+        transferEnabled = _allow;
+    }
+
+    function setGTAddress(address _gtAddress) external onlyAdmin {
+        gtAddress = _gtAddress;
+    }
+
     function payTeachers(uint256 amount) public {
         require(teacherShares.length > 0, "Teachers not initialized");
+        require(gtAddress != address(0), "GT not available");
         for (uint256 i = 0; i < teacherShares.length; i++) {
             uint256 paymentAmount = (amount * teacherShares[i].shares) / 10000;
             IERC20Upgradeable(gtAddress).safeTransferFrom(
@@ -297,5 +325,55 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     // Support multiple wallets or address as admin
     function setAdmin(address _address, bool _allow) external onlyOwner {
         admins[_address] = _allow;
+    }
+
+    function adminTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public onlyAdmin {
+        require(!transferEnabled, "Transfers Enabled, use owner or approved functions");
+        _transfer(from, to, tokenId);
+    }
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override onlyEnabled {
+        //solhint-disable-next-line max-line-length
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "ERC721: caller is not token owner or approved"
+        );
+
+        _transfer(from, to, tokenId);
+    }
+
+    /**
+     * @dev See {IERC721-safeTransferFrom}.
+     */
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override onlyEnabled {
+        safeTransferFrom(from, to, tokenId, "");
+    }
+
+    /**
+     * @dev See {IERC721-safeTransferFrom}.
+     */
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public virtual override onlyEnabled {
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "ERC721: caller is not token owner or approved"
+        );
+        _safeTransfer(from, to, tokenId, data);
     }
 }
