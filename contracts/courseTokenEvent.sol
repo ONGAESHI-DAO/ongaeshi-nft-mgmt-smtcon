@@ -56,8 +56,12 @@ contract CourseTokenEvent is OwnableUpgradeable {
     );
     event TalentMatchConfirmed(
         OGSLib.MatchData existingMatch,
-        address indexed talentAddr,
-        uint256 amount
+        address _talentAddr,
+        uint256 coachTotal,
+        uint256 sponsorTotal,
+        uint256 actualTreasuryTotal,
+        uint256 teacherAmount
+
     );
     event TalentMatchUpdated(
         OGSLib.MatchData existingMatch,
@@ -110,9 +114,13 @@ contract CourseTokenEvent is OwnableUpgradeable {
     function TalentMatchConfirmedEvent(
         OGSLib.MatchData memory _match,
         address _talentAddr,
-        uint256 _amount
+        uint256 coachTotal,
+        uint256 sponsorTotal,
+        uint256 actualTreasuryTotal,
+        uint256 teacherAmount
+        
     ) external onlyExecutor {
-        emit TalentMatchConfirmed(_match, _talentAddr, _amount);
+        emit TalentMatchConfirmed(_match, _talentAddr, coachTotal, sponsorTotal, actualTreasuryTotal, teacherAmount);
     }
 
     function TalentMatchDeletedEvent(

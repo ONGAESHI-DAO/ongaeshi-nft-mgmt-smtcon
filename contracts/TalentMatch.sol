@@ -148,31 +148,37 @@ contract TalentMatch is OwnableUpgradeable {
 
         uint64 actualTreasuryShare = 0;
 
+        uint256 sponsorTotal = 0;
         if (matchData.sponsor != _talent) {
+            sponsorTotal = (_amount * sponsorShare) / 10000;
             IERC20Upgradeable(gtAddress).safeTransferFrom(
                 msg.sender,
                 matchData.sponsor,
-                (_amount * sponsorShare) / 10000
+                sponsorTotal
             );
         } else {
             actualTreasuryShare += sponsorShare;
         }
 
+        uint256 coachTotal = 0;
         if (matchData.coach != address(0)) {
+            coachTotal = (_amount * coachShare) / 10000;
             IERC20Upgradeable(gtAddress).safeTransferFrom(
                 msg.sender,
                 matchData.coach,
-                (_amount * coachShare) / 10000
+                coachTotal
             );
         } else {
             actualTreasuryShare += coachShare;
         }
 
+        uint256 actualTreasuryTotal = 0;
         if (actualTreasuryShare > 0) {
+            actualTreasuryTotal = (_amount * actualTreasuryShare) / 10000;
             IERC20Upgradeable(gtAddress).safeTransferFrom(
                 msg.sender,
                 treasuryAddress,
-                (_amount * actualTreasuryShare) / 10000
+                actualTreasuryTotal
             );
         }
 
@@ -188,7 +194,7 @@ contract TalentMatch is OwnableUpgradeable {
             teacherAmount
         );
         ICourseToken(matchData.nftAddress).payTeachers(teacherAmount);
-        xEmitEvent.TalentMatchConfirmedEvent(matchData, _talent, _amount);
+        xEmitEvent.TalentMatchConfirmedEvent(matchData, _talent, coachTotal, sponsorTotal, actualTreasuryTotal, teacherAmount);
     }
 
     function setGTAddress(address _gtAddress) external onlyAdmin {

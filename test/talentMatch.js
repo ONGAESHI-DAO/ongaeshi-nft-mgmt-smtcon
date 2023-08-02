@@ -457,7 +457,7 @@ describe("NFT Factory Test", function () {
             await gtContract.approve(TalenMatch.address, ethers.utils.parseEther("100"));
             await expect(
                 TalenMatch.confirmTalentMatch(accounts[5].address, ethers.utils.parseEther("100"))
-            ).to.emit(courseTokenEvent, "TalentMatchConfirmed").withArgs(anyValue, accounts[5].address, ethers.utils.parseEther("100"));
+            ).to.emit(courseTokenEvent, "TalentMatchConfirmed").withArgs(anyValue, accounts[5].address, ethers.utils.parseEther("30"), ethers.utils.parseEther("30"), ethers.utils.parseEther("0"), ethers.utils.parseEther("40"));
         });
 
         it("Emits Share Scheme Updated Event", async function () {
