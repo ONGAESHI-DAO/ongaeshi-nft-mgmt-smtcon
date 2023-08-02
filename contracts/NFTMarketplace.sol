@@ -23,31 +23,58 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
     mapping(address => bool) public admins;
     Listing[] public listings;
 
-    ICourseTokenEvent public xEmitEvent;
     address public treasury;
     uint256 public treasuryCommission;
     uint256 public teacherCommission;
     address public gtAddress;
 
     event Received(address, address, uint256);
+
+    event ListingCreated(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        address lister,
+        uint256 price
+    );
+    event ListingUpdated(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        uint256 oldPrice,
+        uint256 newPrice
+    );
+    event ListingDeleted(
+        address indexed courseAddress,
+        uint256 indexed tokenId
+    );
+    event ListingPurchased(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        address buyer,
+        uint256 price
+    );
+
     function initialize(
         address _gtAddress,
         address _treasury,
         uint256 _treasuryCommission,
-        uint256 _teacherCommission,
-        address _emitEventAddr
+        uint256 _teacherCommission
     ) external initializer {
         require(_treasury != address(0), "_treasury is zero");
         require(_gtAddress != address(0), "_gtAddress is zero");
-        require(_treasuryCommission <= 3000, "_treasuryCommission cannot exceed 30%");
-        require(_teacherCommission <= 2000, "_teacherCommission cannot exceed 20%");
+        require(
+            _treasuryCommission <= 3000,
+            "_treasuryCommission cannot exceed 30%"
+        );
+        require(
+            _teacherCommission <= 2000,
+            "_teacherCommission cannot exceed 20%"
+        );
 
         __Ownable_init();
         gtAddress = _gtAddress;
         treasury = _treasury;
         treasuryCommission = _treasuryCommission;
         teacherCommission = _teacherCommission;
-        xEmitEvent = ICourseTokenEvent(_emitEventAddr);
         admins[msg.sender] = true;
     }
 
@@ -85,12 +112,7 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         listings.push(newListing);
         listingMap[_tokenAddress][_tokenId] = newListing;
 
-        xEmitEvent.ListingCreatedEvent(
-            _tokenAddress,
-            _tokenId,
-            msg.sender,
-            _amount
-        );
+        emit ListingCreated(_tokenAddress, _tokenId, msg.sender, _amount);
     }
 
     function cancelListing(address _tokenAddress, uint256 _tokenId) external {
@@ -116,7 +138,7 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
             _tokenId
         );
 
-        xEmitEvent.ListingDeletedEvent(_tokenAddress, _tokenId);
+        emit ListingDeleted(_tokenAddress, _tokenId);
     }
 
     function updateListing(
@@ -134,7 +156,7 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         listingMap[_tokenAddress][_tokenId].price = _amount;
         listings[toBeUpdatedListing.index].price = _amount;
 
-        xEmitEvent.ListingUpdatedEvent(
+        emit ListingUpdated(
             _tokenAddress,
             _tokenId,
             toBeUpdatedListing.price,
@@ -186,7 +208,7 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
             _tokenId
         );
 
-        xEmitEvent.ListingPurchasedEvent(
+        emit ListingPurchased(
             _tokenAddress,
             _tokenId,
             msg.sender,
@@ -199,13 +221,23 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         treasury = _newTreasury;
     }
 
-    function setTreasuryCommission(uint256 _newTreasuryCommission) external onlyAdmin {
-        require(_newTreasuryCommission <= 3000, "_newTreasuryCommission cannot exceed 30%");
+    function setTreasuryCommission(
+        uint256 _newTreasuryCommission
+    ) external onlyAdmin {
+        require(
+            _newTreasuryCommission <= 3000,
+            "_newTreasuryCommission cannot exceed 30%"
+        );
         treasuryCommission = _newTreasuryCommission;
     }
 
-    function setTeacherCommission(uint256 _newTeacherCommission) external onlyAdmin {
-        require(_newTeacherCommission <= 2000, "_newTeacherCommission cannot exceed 20%");
+    function setTeacherCommission(
+        uint256 _newTeacherCommission
+    ) external onlyAdmin {
+        require(
+            _newTeacherCommission <= 2000,
+            "_newTeacherCommission cannot exceed 20%"
+        );
         teacherCommission = _newTeacherCommission;
     }
 
@@ -217,10 +249,13 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
     ) external override returns (bytes4) {
         data;
         emit Received(operator, from, tokenId);
-        return  0x150b7a02;
+        return 0x150b7a02;
     }
 
-    function getListing(address _tokenAddress, uint256 _tokenId) external view returns (Listing memory) {
+    function getListing(
+        address _tokenAddress,
+        uint256 _tokenId
+    ) external view returns (Listing memory) {
         return listingMap[_tokenAddress][_tokenId];
     }
 
