@@ -96,11 +96,7 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
             "Token needs repair"
         );
 
-        IERC721Upgradeable(_tokenAddress).safeTransferFrom(
-            msg.sender,
-            address(this),
-            _tokenId
-        );
+        transferCourseToken(_tokenAddress, msg.sender, address(this), _tokenId);
 
         uint256 listingIndex = listings.length;
         Listing memory newListing;
@@ -132,11 +128,8 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         ] = toBeUpdatedListing;
         listings.pop();
         delete listingMap[_tokenAddress][_tokenId];
-        IERC721Upgradeable(_tokenAddress).safeTransferFrom(
-            address(this),
-            msg.sender,
-            _tokenId
-        );
+
+        transferCourseToken(_tokenAddress, address(this), msg.sender, _tokenId);
 
         emit ListingDeleted(_tokenAddress, _tokenId);
     }
@@ -165,11 +158,7 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
     }
 
     function buyListing(address _tokenAddress, uint256 _tokenId) external {
-        // collect GT
-        // pay nft owner
-        // pay teachers
-        // pay treasury
-        // transfer nft
+        // collect GT | pay nft owner | pay teachers | pay treasury | transfer nft
 
         Listing memory toBeRemovedListing = listingMap[_tokenAddress][_tokenId];
         IERC20Upgradeable(gtAddress).safeTransferFrom(
@@ -202,11 +191,8 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
             toBeRemovedListing.nftOwner,
             forOwner
         );
-        IERC721Upgradeable(_tokenAddress).safeTransferFrom(
-            address(this),
-            msg.sender,
-            _tokenId
-        );
+        transferCourseToken(_tokenAddress, address(this), msg.sender, _tokenId);
+
 
         emit ListingPurchased(
             _tokenAddress,
@@ -274,5 +260,18 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
     modifier onlyAdmin() {
         require(admins[msg.sender], "admin: wut?");
         _;
+    }
+
+    function transferCourseToken(
+        address courseToken,
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal {
+        if (ICourseToken(courseToken).transferEnabled()) {
+            IERC721Upgradeable(courseToken).safeTransferFrom(from, to, tokenId);
+        } else {
+            ICourseToken(courseToken).adminTransferFrom(from, to, tokenId);
+        }
     }
 }

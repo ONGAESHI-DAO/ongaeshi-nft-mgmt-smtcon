@@ -15,5 +15,13 @@ interface ICourseToken {
 
     function isLended(uint256 _tokenId) external returns (address);
 
-    function repairCost(uint256 _tokenId) external returns (uint256); 
+    function repairCost(uint256 _tokenId) external returns (uint256);
+
+    function transferEnabled() external returns(bool);
+
+    function adminTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external;
 }
