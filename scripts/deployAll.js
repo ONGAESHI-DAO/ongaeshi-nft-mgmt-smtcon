@@ -25,7 +25,7 @@ async function main(treasuryAddress) {
     await courseFactory.deployed();
     console.log("deployed TokenFactory: ", courseFactory.address);
 
-    const TalenMatch = await hre.upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 2000, 3000, 3000, 2000, courseTokenEvent.address, treasuryAddress]);
+    const TalenMatch = await hre.upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 3000, 3000, 4000, courseTokenEvent.address, treasuryAddress]);
     await TalenMatch.deployed();
     console.log("deployed TalenMatch: ", TalenMatch.address);
 
