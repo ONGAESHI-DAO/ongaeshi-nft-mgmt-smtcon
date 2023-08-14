@@ -96,6 +96,6 @@ interface ICourseTokenEvent {
     function TokenLendedEvent(
         address _courseAddress,
         uint256 _tokenId,
-        address destiny
+        string calldata _Id
     ) external;
 }
