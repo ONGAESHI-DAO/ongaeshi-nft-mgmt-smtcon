@@ -84,7 +84,11 @@ contract CourseTokenEvent is OwnableUpgradeable {
         bool isCancel
     );
     event Repaired(address indexed courseAddress, uint256 indexed tokenId);
-    event TokenLended(address indexed courseAddress, uint256 indexed tokenId, address destiny);
+    event TokenLended(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        address destiny
+    );
 
     function initialize() external initializer {
         __Ownable_init();
@@ -105,7 +109,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
 
     function TalentMatchAddedEvent(
         OGSLib.MatchData memory _newMatch,
-        address _talentAddr, 
+        address _talentAddr,
         uint256 _amount
     ) external onlyExecutor {
         emit TalentMatchAdded(_newMatch, _talentAddr, _amount);
