@@ -54,14 +54,17 @@ async function deployTestEnvFixtureTalentMatch() {
     const courseTokenDeployer = await ethers.getContractFactory("CourseToken");
     const courseTokenFactoryDeployer = await ethers.getContractFactory('CourseTokenFactory');
     const talentMatchDeployer = await ethers.getContractFactory('TalentMatch');
+    const nftMarketplaceDeployer = await ethers.getContractFactory('NFTMarketplace');
 
     const gtContract = await GTFactory.deploy();
     const courseTokenEvent = await upgrades.deployProxy(courseTokenEventDeployer);
     const courseTokenBeacon = await upgrades.deployBeacon(courseTokenDeployer);
     const courseFactory = await upgrades.deployProxy(courseTokenFactoryDeployer, [courseTokenBeacon.address, gtContract.address, courseTokenEvent.address]);
+    const NFTMarketplace = await upgrades.deployProxy(nftMarketplaceDeployer, [gtContract.address, accounts[9].address, 3000, 2000]);
     const TalenMatch = await upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 3000, 3000, 4000, courseTokenEvent.address, accounts[9].address]);
     await courseTokenEvent.setExecutor(courseFactory.address, true);
     await courseTokenEvent.setExecutor(TalenMatch.address, true);
+    await courseTokenEvent.setExecutor(NFTMarketplace.address, true);
 
     // give accounts some GT
     for (let i = 0; i < 5; i++) {
@@ -85,8 +88,9 @@ async function deployTestEnvFixtureTalentMatch() {
     await courseFactory.deployCourseToken("Token Name", "Symbol", "test://uri/", ethers.utils.parseEther("1"), 9000, 100, accounts[9].address);
     const courseNFT = await courseTokenDeployer.attach(await courseFactory.deployedAddresses(0));
     await courseNFT.addTeacherShares(defaultTeacherShares);
-    await courseNFT.mintByAdmin(3, accounts[8].address);
-    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares };
+    await courseNFT.mintByAdmin(5, accounts[8].address);
+    await courseNFT.setAdmin( NFTMarketplace.address, true);
+    return { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, NFTMarketplace, owner, accounts, defaultTeacherShares };
 }
 
 async function deployTestEnvFixtureWithoutGT() {
