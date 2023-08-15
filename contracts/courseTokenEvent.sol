@@ -84,7 +84,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
         bool isCancel
     );
     event Repaired(address indexed courseAddress, uint256 indexed tokenId);
-    event TokenLended(address indexed courseAddress, uint256 indexed tokenId, string loanId);
+    event TokenLended(address indexed courseAddress, uint256 indexed tokenId, bytes20 loanId);
 
     function initialize() external initializer {
         __Ownable_init();
@@ -224,7 +224,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
     function TokenLendedEvent(
         address _courseAddress,
         uint256 _tokenId,
-        string calldata _Id
+        bytes20 _Id
     ) external onlyExecutor {
         emit TokenLended(_courseAddress, _tokenId, _Id);
     }

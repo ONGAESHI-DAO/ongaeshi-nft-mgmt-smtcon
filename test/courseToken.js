@@ -8,6 +8,9 @@ const { deployTestEnvFixture } = require("./testLib")
 
 const SUPPLY_MAX = 100;
 const BASE_URI = "test://uri/";
+const loanID_1 = "9csh28dnnairbdhwovhe";
+const loanID_2 = "jd3jdbig5efn6cuiyw2r";
+const loanID_3 = "6fbju4jfbg84hufv804w";
 
 describe("NFT Test", function () {
 
@@ -225,17 +228,17 @@ describe("NFT Test", function () {
       const { gtContract, courseTokenEvent, courseFactory, TalenMatch, courseNFT, owner, accounts, defaultTeacherShares } = await loadFixture(deployTestEnvFixture);
       await courseNFT.mintByAdmin(3, accounts[0].address);
 
-      await courseNFT.lendToken(1, "123");
-      await courseNFT.lendToken(2, "456");
-      expect(await courseNFT.isLended(1)).to.equal("123");
-      expect(await courseNFT.isLended(2)).to.equal("456");
-      expect(await courseNFT.isLended(3)).to.equal("");
-      await expect(courseNFT.lendToken(1, "789")).to.be.revertedWith("Token already lended");
+      await courseNFT.lendToken(1, ethers.utils.hexlify(ethers.utils.toUtf8Bytes(loanID_1)));
+      await courseNFT.lendToken(2, ethers.utils.hexlify(ethers.utils.toUtf8Bytes(loanID_2)));
+      expect(ethers.utils.toUtf8String(await courseNFT.isLended(1))).to.equal(loanID_1);
+      expect(ethers.utils.toUtf8String(await courseNFT.isLended(2))).to.equal(loanID_2);
+      expect(await courseNFT.isLended(3)).to.equal(ethers.constants.AddressZero);
+      await expect(courseNFT.lendToken(1, ethers.utils.hexlify(ethers.utils.toUtf8Bytes(loanID_1)))).to.be.revertedWith("Token already lended");
       await courseNFT.returnToken(2, ethers.utils.parseEther("1"), false);
-      expect(await courseNFT.isLended(1)).to.equal("123");
-      expect(await courseNFT.isLended(2)).to.equal("");
-      expect(await courseNFT.isLended(3)).to.equal("");
-      await expect(courseNFT.lendToken(42, "555")).to.be.revertedWith("Token does not exists");
+      expect(ethers.utils.toUtf8String(await courseNFT.isLended(1))).to.equal(loanID_1);
+      expect(await courseNFT.isLended(2)).to.equal(ethers.constants.AddressZero);
+      expect(await courseNFT.isLended(3)).to.equal(ethers.constants.AddressZero);
+      await expect(courseNFT.lendToken(42, ethers.utils.hexlify(ethers.utils.toUtf8Bytes(loanID_3)))).to.be.revertedWith("Token does not exists");
     });
 
     it("Repair", async function () {

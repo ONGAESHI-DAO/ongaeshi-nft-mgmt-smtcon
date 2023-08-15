@@ -11,7 +11,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using StringsUpgradeable for uint256;
 
-    mapping(uint256 => string) public isLended;
+    mapping(uint256 => bytes20) public isLended;
     mapping(uint256 => bool) public needRepairMap;
     mapping(uint256 => uint256) public repairCost;
     mapping(uint256 => string) public tokenCID;
@@ -178,9 +178,9 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         supplyLimit = newSupply;
     }
 
-    function lendToken(uint256 _tokenId, string calldata _Id) external onlyAdmin {
+    function lendToken(uint256 _tokenId, bytes20 _Id) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
-        require(bytes(isLended[_tokenId]).length == 0, "Token already lended");
+        require(isLended[_tokenId] == 0, "Token already lended");
         require(repairCost[_tokenId] == 0, "Token needs repair");
         isLended[_tokenId] = _Id;
         xEmitEvent.TokenLendedEvent(address(this), _tokenId, _Id);
@@ -192,7 +192,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         bool _isCancel
     ) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
-        require(bytes(isLended[_tokenId]).length != 0, "Token not on loan");
+        require(isLended[_tokenId] != 0, "Token not on loan");
         delete isLended[_tokenId];
         breakToken(_tokenId, _repairCost, _isCancel);
     }
