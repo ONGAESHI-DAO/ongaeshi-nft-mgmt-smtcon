@@ -193,14 +193,16 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     ) external onlyAdmin {
         require(_exists(_tokenId), "Token does not exists");
         require(isLended[_tokenId] != 0, "Token not on loan");
+        bytes20 _Id = isLended[_tokenId];
         delete isLended[_tokenId];
-        breakToken(_tokenId, _repairCost, _isCancel);
+        breakToken(_tokenId, _repairCost, _isCancel, _Id);
     }
 
     function breakToken(
         uint256 _tokenId,
         uint256 _repairCost,
-        bool _isCancel
+        bool _isCancel,
+        bytes20 _Id
     ) internal {
         require(_exists(_tokenId), "Token does not exists");
         require(!needRepairMap[_tokenId], "Token already needs repair");
@@ -210,7 +212,8 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             address(this),
             _tokenId,
             _repairCost,
-            _isCancel
+            _isCancel,
+            _Id
         );
     }
 
