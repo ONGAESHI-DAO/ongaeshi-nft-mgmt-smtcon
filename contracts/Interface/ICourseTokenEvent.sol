@@ -88,7 +88,8 @@ interface ICourseTokenEvent {
         address _courseAddress,
         uint256 _tokenId,
         uint256 _repairCost,
-        bool _isCancel
+        bool _isCancel,
+        bytes20 _Id
     ) external;
 
     function RepairedEvent(address _courseAddress, uint256 _tokenId) external;
