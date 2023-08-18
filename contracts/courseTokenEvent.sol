@@ -56,8 +56,11 @@ contract CourseTokenEvent is OwnableUpgradeable {
     );
     event TalentMatchConfirmed(
         OGSLib.MatchData existingMatch,
-        address indexed talentAddr,
-        uint256 amount
+        address _talentAddr,
+        uint256 coachTotal,
+        uint256 sponsorTotal,
+        uint256 actualTreasuryTotal,
+        uint256 teacherAmount
     );
     event TalentMatchUpdated(
         OGSLib.MatchData existingMatch,
@@ -69,7 +72,6 @@ contract CourseTokenEvent is OwnableUpgradeable {
         address indexed talentAddr
     );
     event ShareSchemeUpdated(
-        uint256 talentShare,
         uint256 coachShare,
         uint256 sponsorShare,
         uint256 teacherShare
@@ -78,10 +80,15 @@ contract CourseTokenEvent is OwnableUpgradeable {
         address indexed courseAddress,
         uint256 indexed tokenId,
         uint256 repairCost,
-        bool isCancel
+        bool isCancel,
+        bytes20 loanId
     );
     event Repaired(address indexed courseAddress, uint256 indexed tokenId);
-    event TokenLended(address indexed courseAddress, uint256 indexed tokenId, address destiny);
+    event TokenLended(
+        address indexed courseAddress,
+        uint256 indexed tokenId,
+        bytes20 loanId
+    );
 
     function initialize() external initializer {
         __Ownable_init();
@@ -89,22 +96,16 @@ contract CourseTokenEvent is OwnableUpgradeable {
     }
 
     function ShareSchemeUpdatedEvent(
-        uint256 _talentShare,
         uint256 _coachShare,
         uint256 _sponsorShare,
         uint256 _teacherShare
     ) external onlyExecutor {
-        emit ShareSchemeUpdated(
-            _talentShare,
-            _coachShare,
-            _sponsorShare,
-            _teacherShare
-        );
+        emit ShareSchemeUpdated(_coachShare, _sponsorShare, _teacherShare);
     }
 
     function TalentMatchAddedEvent(
         OGSLib.MatchData memory _newMatch,
-        address _talentAddr, 
+        address _talentAddr,
         uint256 _amount
     ) external onlyExecutor {
         emit TalentMatchAdded(_newMatch, _talentAddr, _amount);
@@ -113,9 +114,19 @@ contract CourseTokenEvent is OwnableUpgradeable {
     function TalentMatchConfirmedEvent(
         OGSLib.MatchData memory _match,
         address _talentAddr,
-        uint256 _amount
+        uint256 coachTotal,
+        uint256 sponsorTotal,
+        uint256 actualTreasuryTotal,
+        uint256 teacherAmount
     ) external onlyExecutor {
-        emit TalentMatchConfirmed(_match, _talentAddr, _amount);
+        emit TalentMatchConfirmed(
+            _match,
+            _talentAddr,
+            coachTotal,
+            sponsorTotal,
+            actualTreasuryTotal,
+            teacherAmount
+        );
     }
 
     function TalentMatchDeletedEvent(
@@ -204,9 +215,10 @@ contract CourseTokenEvent is OwnableUpgradeable {
         address _courseAddress,
         uint256 _tokenId,
         uint256 _repairCost,
-        bool _isCancel
+        bool _isCancel,
+        bytes20 _Id
     ) external onlyExecutor {
-        emit NeedRepair(_courseAddress, _tokenId, _repairCost, _isCancel);
+        emit NeedRepair(_courseAddress, _tokenId, _repairCost, _isCancel, _Id);
     }
 
     function RepairedEvent(
@@ -219,9 +231,9 @@ contract CourseTokenEvent is OwnableUpgradeable {
     function TokenLendedEvent(
         address _courseAddress,
         uint256 _tokenId,
-        address destiny
+        bytes20 _Id
     ) external onlyExecutor {
-        emit TokenLended(_courseAddress, _tokenId, destiny);
+        emit TokenLended(_courseAddress, _tokenId, _Id);
     }
 
     // Support multiple wallets or address as admin

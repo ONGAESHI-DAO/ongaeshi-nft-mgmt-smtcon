@@ -1,6 +1,6 @@
 const hre = require("hardhat");
 
-async function main() {
+async function main(treasuryAddress) {
     
     const GTFactory = await hre.ethers.getContractFactory('GT');
     const courseTokenEventDeployer = await hre.ethers.getContractFactory('CourseTokenEvent');
@@ -21,11 +21,11 @@ async function main() {
     await courseTokenBeacon.deployed()
     console.log("deployed Beacon: ", courseTokenBeacon.address);
     
-    const courseFactory = await hre.upgrades.deployProxy(courseTokenFactoryDeployer, [courseTokenBeacon.address, gtContract.address, courseTokenEvent.address]);
+    const courseFactory = await hre.upgrades.deployProxy(courseTokenFactoryDeployer, [courseTokenBeacon.address, gtContract.address, courseTokenEvent.address,]);
     await courseFactory.deployed();
     console.log("deployed TokenFactory: ", courseFactory.address);
 
-    const TalenMatch = await hre.upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 2000, 3000, 3000, 2000, courseTokenEvent.address]);
+    const TalenMatch = await hre.upgrades.deployProxy(talentMatchDeployer, [gtContract.address, 3000, 3000, 4000, courseTokenEvent.address, treasuryAddress]);
     await TalenMatch.deployed();
     console.log("deployed TalenMatch: ", TalenMatch.address);
 
@@ -41,5 +41,5 @@ async function main() {
 
 }
 
-
-main();
+const treasuryAddress = "0x821f3361D454cc98b7555221A06Be563a7E2E0A6"
+main(treasuryAddress);
