@@ -8,6 +8,7 @@ library OGSLib {
     }
 
     struct MatchData {
+        address talent;
         address coach;
         address sponsor;
         address teacher;
