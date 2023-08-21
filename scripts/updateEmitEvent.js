@@ -12,8 +12,8 @@ async function setNewEmitEvent(targetAddress, emitEventAddress) {
 
 // please fill up the addresses
 // caller must be owner
-const targetAddress = "" // courseFactory, courseToken, talentMatch address
-const emitEventAddress = ""
+const targetAddress = "0xf5bbe568B64d9933AE0680147394A9752b084eBc" // courseFactory, courseToken, talentMatch address
+const emitEventAddress = "0xC1bc3350B679E37873658d30A688962DdB8A0C15"
 
 
 async function main() {

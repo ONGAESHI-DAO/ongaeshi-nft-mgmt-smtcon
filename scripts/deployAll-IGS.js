@@ -39,29 +39,29 @@ async function main(treasuryAddress) {
     const airdrop = await airdropDeployer.deploy(gtContract.address);
     console.log("deployed Airdrop: ", airdrop.address);
 
-    const addr1 = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" // airdrop wallet
-    const addr2 = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199" // gt exchange wallet
-    // const addr3 = "0xACffE377D3BE67d927f3cE31c07A1c4B603F601d"
+    const addr1 = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" // airdrop wallet (localhost default wallet)
+    const addr2 = "0x4d896ACA56c84D5b7D2eC817031E2E98cEb50F57" // gt exchange wallet (igs wallet)
+    const addr3 = "0xACffE377D3BE67d927f3cE31c07A1c4B603F601d" // talent matching (igs wallet)
     
-    txn = await gtContract.transfer(addr1, ethers.utils.parseEther("20000000"))    
+    txn = await gtContract.transfer(addr1, ethers.utils.parseEther("10000000"))    
     await txn.wait();
     console.log("Done sending GT token to address", addr1);
 
-    txn = await gtContract.transfer(addr2, ethers.utils.parseEther("20000000"))    
+    txn = await gtContract.transfer(addr2, ethers.utils.parseEther("10000000"))    
     await txn.wait();
     console.log("Done sending GT token to address", addr2);
 
-    // txn = await gtContract.transfer(addr2, ethers.utils.parseEther("10000000"))    
-    // await txn.wait();
-    // console.log("Done sending GT token to address", addr2);
+    txn = await gtContract.transfer(addr3, ethers.utils.parseEther("10000000"))    
+    await txn.wait();
+    console.log("Done sending GT token to address", addr3);
 
     // txn = await gtContract.transfer(addr3, ethers.utils.parseEther("10000000"))    
     // await txn.wait();
     // console.log("Done sending GT token to address", addr3);
 
     console.log(await gtContract.balanceOf(addr1))
-    // console.log(await gtContract.balanceOf(addr2))
-    // console.log(await gtContract.balanceOf(addr3))
+    console.log(await gtContract.balanceOf(addr2))
+    console.log(await gtContract.balanceOf(addr3))
     
 
 
