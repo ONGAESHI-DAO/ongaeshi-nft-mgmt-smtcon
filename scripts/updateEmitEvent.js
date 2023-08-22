@@ -3,9 +3,14 @@ const hre = require("hardhat");
 async function setNewEmitEvent(targetAddress, emitEventAddress) {
     
     const contract = await hre.ethers.getContractAt("CourseToken", targetAddress);
+    const EmitEvent = await hre.ethers.getContractAt("CourseTokenEvent", emitEventAddress);
 
     let txn = await contract.setEmitEvent(emitEventAddress);
     await txn.wait();
+
+    txn = await EmitEvent.setExecutor(targetAddress, true);
+    await txn.wait();
+
     console.log("set emitEvent done for: ", targetAddress);
 
 }
