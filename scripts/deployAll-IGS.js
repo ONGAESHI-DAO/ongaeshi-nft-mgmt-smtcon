@@ -63,7 +63,8 @@ async function main(treasuryAddress) {
     console.log(await gtContract.balanceOf(addr2))
     console.log(await gtContract.balanceOf(addr3))
     
-
+    txn = await airdrop.setAdmin(addr1, true);
+    await txn.wait();
 
 }
 

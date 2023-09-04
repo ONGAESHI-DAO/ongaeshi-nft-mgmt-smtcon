@@ -210,7 +210,7 @@ contract TalentMatch is OwnableUpgradeable {
         treasuryAddress = _treasuryAddress;
     }
 
-    function setEmitEvent(address _emitEventAddr) external onlyOwner {
+    function setEmitEvent(address _emitEventAddr) external onlyAdmin {
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }

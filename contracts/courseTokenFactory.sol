@@ -70,12 +70,16 @@ contract CourseTokenFactory is OwnableUpgradeable {
         return deployedAddresses;
     }
 
-    function setBeaconAddr(address _beaconAddress) external onlyOwner {
+    function setBeaconAddr(address _beaconAddress) external onlyAdmin {
         require(_beaconAddress != address(0), "_beaconAddress is zero");
         beaconAddr = _beaconAddress;
     }
 
-    function setEmitEvent(address _emitEventAddr) external onlyOwner {
+    function setGTAddress(address _gtAddress) external onlyAdmin {
+        gtAddress = _gtAddress;
+    }
+
+    function setEmitEvent(address _emitEventAddr) external onlyAdmin {
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }

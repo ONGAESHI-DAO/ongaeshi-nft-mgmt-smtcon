@@ -202,6 +202,10 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         );
     }
 
+    function setGTAddress(address _gtAddress) external onlyAdmin {
+        gtAddress = _gtAddress;
+    }
+
     function setTreasury(address _newTreasury) external onlyAdmin {
         require(_newTreasury != address(0), "newTreasury address 0");
         treasury = _newTreasury;
