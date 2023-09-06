@@ -16,7 +16,7 @@ contract TalentMatch is OwnableUpgradeable {
     uint64 public sponsorShare;
     uint64 public teacherShare;
 
-    mapping(address => OGSLib.MatchData) public matchRegistry;
+    mapping(bytes20 => OGSLib.MatchData) public matchRegistry;
     mapping(address => bool) public admins;
     ICourseTokenEvent public xEmitEvent;
 
@@ -72,6 +72,7 @@ contract TalentMatch is OwnableUpgradeable {
     }
 
     function addTalentMatch(
+        bytes20 _Id,
         address _talent,
         address _coach,
         address _sponsor,
@@ -83,10 +84,11 @@ contract TalentMatch is OwnableUpgradeable {
         uint256 _payDate
     ) external onlyAdmin {
         require(
-            matchRegistry[_talent].nftAddress == address(0),
+            matchRegistry[_Id].nftAddress == address(0),
             "match data already exists"
         );
         OGSLib.MatchData memory newMatch;
+        newMatch.talent = _talent;
         newMatch.coach = _coach;
         newMatch.sponsor = _sponsor;
         newMatch.teacher = _teacher;
@@ -96,11 +98,12 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.matchDate = _matchDate;
         newMatch.payDate = _payDate;
 
-        matchRegistry[_talent] = newMatch;
-        xEmitEvent.TalentMatchAddedEvent(newMatch, _talent, _amount);
+        matchRegistry[_Id] = newMatch;
+        xEmitEvent.TalentMatchAddedEvent(newMatch, _Id, _amount);
     }
 
     function updateTalentMatch(
+        bytes20 _Id,
         address _talent,
         address _coach,
         address _sponsor,
@@ -112,10 +115,11 @@ contract TalentMatch is OwnableUpgradeable {
         uint256 _payDate
     ) external onlyAdmin {
         require(
-            matchRegistry[_talent].nftAddress != address(0),
+            matchRegistry[_Id].nftAddress != address(0),
             "match data does not exists"
         );
         OGSLib.MatchData memory newMatch;
+        newMatch.talent = _talent;
         newMatch.coach = _coach;
         newMatch.sponsor = _sponsor;
         newMatch.teacher = _teacher;
@@ -125,31 +129,31 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.matchDate = _matchDate;
         newMatch.payDate = _payDate;
 
-        matchRegistry[_talent] = newMatch;
-        xEmitEvent.TalentMatchUpdatedEvent(newMatch, _talent, _amount);
+        matchRegistry[_Id] = newMatch;
+        xEmitEvent.TalentMatchUpdatedEvent(newMatch, _Id, _amount);
     }
 
-    function deleteTalentMatch(address _talent) external onlyAdmin {
-        OGSLib.MatchData memory _match = matchRegistry[_talent];
+    function deleteTalentMatch(bytes20 _Id) external onlyAdmin {
+        OGSLib.MatchData memory _match = matchRegistry[_Id];
         require(_match.nftAddress != address(0), "match data does not exists");
-        xEmitEvent.TalentMatchDeletedEvent(_match, _talent);
-        delete matchRegistry[_talent];
+        xEmitEvent.TalentMatchDeletedEvent(_match, _Id);
+        delete matchRegistry[_Id];
     }
 
     function confirmTalentMatch(
-        address _talent,
+        bytes20 _Id,
         uint256 _amount
     ) external onlyAdmin {
-        OGSLib.MatchData memory matchData = matchRegistry[_talent];
+        OGSLib.MatchData memory matchData = matchRegistry[_Id];
         require(matchData.nftAddress != address(0), "match does not exist");
         require(matchData.amount == _amount, "amount does not match");
         require(gtAddress != address(0), "GT not available");
-        delete matchRegistry[_talent];
+        delete matchRegistry[_Id];
 
         uint64 actualTreasuryShare = 0;
 
         uint256 sponsorTotal = 0;
-        if (matchData.sponsor != _talent) {
+        if (matchData.sponsor != matchData.talent) {
             sponsorTotal = (_amount * sponsorShare) / 10000;
             IERC20Upgradeable(gtAddress).safeTransferFrom(
                 msg.sender,
@@ -194,7 +198,7 @@ contract TalentMatch is OwnableUpgradeable {
             teacherAmount
         );
         ICourseToken(matchData.nftAddress).payTeachers(teacherAmount);
-        xEmitEvent.TalentMatchConfirmedEvent(matchData, _talent, coachTotal, sponsorTotal, actualTreasuryTotal, teacherAmount);
+        xEmitEvent.TalentMatchConfirmedEvent(matchData, _Id, coachTotal, sponsorTotal, actualTreasuryTotal, teacherAmount);
     }
 
     function setGTAddress(address _gtAddress) external onlyAdmin {
@@ -206,7 +210,7 @@ contract TalentMatch is OwnableUpgradeable {
         treasuryAddress = _treasuryAddress;
     }
 
-    function setEmitEvent(address _emitEventAddr) external onlyOwner {
+    function setEmitEvent(address _emitEventAddr) external onlyAdmin {
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         xEmitEvent = ICourseTokenEvent(_emitEventAddr);
     }

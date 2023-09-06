@@ -51,12 +51,12 @@ contract CourseTokenEvent is OwnableUpgradeable {
     );
     event TalentMatchAdded(
         OGSLib.MatchData newMatch,
-        address indexed talentAddr,
+        bytes20 indexed _Id,
         uint256 amount
     );
     event TalentMatchConfirmed(
         OGSLib.MatchData existingMatch,
-        address _talentAddr,
+        bytes20 _Id,
         uint256 coachTotal,
         uint256 sponsorTotal,
         uint256 actualTreasuryTotal,
@@ -64,12 +64,12 @@ contract CourseTokenEvent is OwnableUpgradeable {
     );
     event TalentMatchUpdated(
         OGSLib.MatchData existingMatch,
-        address indexed talentAddr,
+        bytes20 indexed _Id,
         uint256 amount
     );
     event TalentMatchDeleted(
         OGSLib.MatchData existingMatch,
-        address indexed talentAddr
+        bytes20 indexed _Id
     );
     event ShareSchemeUpdated(
         uint256 coachShare,
@@ -105,15 +105,15 @@ contract CourseTokenEvent is OwnableUpgradeable {
 
     function TalentMatchAddedEvent(
         OGSLib.MatchData memory _newMatch,
-        address _talentAddr,
+        bytes20 _Id,
         uint256 _amount
     ) external onlyExecutor {
-        emit TalentMatchAdded(_newMatch, _talentAddr, _amount);
+        emit TalentMatchAdded(_newMatch, _Id, _amount);
     }
 
     function TalentMatchConfirmedEvent(
         OGSLib.MatchData memory _match,
-        address _talentAddr,
+        bytes20 _Id,
         uint256 coachTotal,
         uint256 sponsorTotal,
         uint256 actualTreasuryTotal,
@@ -121,7 +121,7 @@ contract CourseTokenEvent is OwnableUpgradeable {
     ) external onlyExecutor {
         emit TalentMatchConfirmed(
             _match,
-            _talentAddr,
+            _Id,
             coachTotal,
             sponsorTotal,
             actualTreasuryTotal,
@@ -131,17 +131,17 @@ contract CourseTokenEvent is OwnableUpgradeable {
 
     function TalentMatchDeletedEvent(
         OGSLib.MatchData memory _match,
-        address _talentAddr
+        bytes20 _Id
     ) external onlyExecutor {
-        emit TalentMatchDeleted(_match, _talentAddr);
+        emit TalentMatchDeleted(_match, _Id);
     }
 
     function TalentMatchUpdatedEvent(
         OGSLib.MatchData calldata _match,
-        address _talentAddr,
+        bytes20 _Id,
         uint256 _amount
     ) external onlyExecutor {
-        emit TalentMatchUpdated(_match, _talentAddr, _amount);
+        emit TalentMatchUpdated(_match, _Id, _amount);
     }
 
     function TokenMintEvent(

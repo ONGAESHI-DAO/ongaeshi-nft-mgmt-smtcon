@@ -52,13 +52,13 @@ interface ICourseTokenEvent {
 
     function TalentMatchAddedEvent(
         OGSLib.MatchData memory _newMatch,
-        address _talentAddr,
+        bytes20 _Id,
         uint256 _amount
     ) external;
 
     function TalentMatchConfirmedEvent(
         OGSLib.MatchData memory _match,
-        address _talentAddr,
+        bytes20 _Id,
         uint256 coachTotal,
         uint256 sponsorTotal,
         uint256 actualTreasuryTotal,
@@ -67,12 +67,12 @@ interface ICourseTokenEvent {
 
     function TalentMatchDeletedEvent(
         OGSLib.MatchData memory _match,
-        address _talentAddr
+        bytes20 _Id
     ) external;
 
     function TalentMatchUpdatedEvent(
         OGSLib.MatchData calldata _match,
-        address _talentAddr,
+        bytes20 _Id,
         uint256 _amount
     ) external;
 
