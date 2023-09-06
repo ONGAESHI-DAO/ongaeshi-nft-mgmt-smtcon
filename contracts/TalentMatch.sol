@@ -76,7 +76,6 @@ contract TalentMatch is OwnableUpgradeable {
         address _talent,
         address _coach,
         address _sponsor,
-        address _teacher,
         address _nftAddress,
         uint256 _tokenId,
         uint256 _amount,
@@ -91,7 +90,6 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.talent = _talent;
         newMatch.coach = _coach;
         newMatch.sponsor = _sponsor;
-        newMatch.teacher = _teacher;
         newMatch.nftAddress = _nftAddress;
         newMatch.tokenId = _tokenId;
         newMatch.amount = _amount;
@@ -107,7 +105,6 @@ contract TalentMatch is OwnableUpgradeable {
         address _talent,
         address _coach,
         address _sponsor,
-        address _teacher,
         address _nftAddress,
         uint256 _tokenId,
         uint256 _amount,
@@ -122,7 +119,6 @@ contract TalentMatch is OwnableUpgradeable {
         newMatch.talent = _talent;
         newMatch.coach = _coach;
         newMatch.sponsor = _sponsor;
-        newMatch.teacher = _teacher;
         newMatch.nftAddress = _nftAddress;
         newMatch.tokenId = _tokenId;
         newMatch.amount = _amount;

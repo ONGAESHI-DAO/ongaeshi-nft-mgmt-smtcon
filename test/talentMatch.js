@@ -25,8 +25,7 @@ describe("NFT Factory Test", function () {
                 ethers.utils.toUtf8Bytes(loanID_1),
                 accounts[5].address, 
                 accounts[6].address, 
-                accounts[7].address, 
-                accounts[8].address, 
+                accounts[7].address,
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -37,7 +36,6 @@ describe("NFT Factory Test", function () {
             expect(data.talent).to.equal(accounts[5].address);
             expect(data.coach).to.equal(accounts[6].address);
             expect(data.sponsor).to.equal(accounts[7].address);
-            expect(data.teacher).to.equal(accounts[8].address);
             expect(data.nftAddress).to.equal(courseNFT.address);
             expect(data.tokenId).to.equal(0);
         });
@@ -48,8 +46,7 @@ describe("NFT Factory Test", function () {
                 ethers.utils.toUtf8Bytes(loanID_1),
                 accounts[5].address, 
                 accounts[6].address, 
-                accounts[7].address, 
-                accounts[8].address, 
+                accounts[7].address,
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -59,7 +56,6 @@ describe("NFT Factory Test", function () {
             const data = await TalenMatch.matchRegistry(ethers.utils.toUtf8Bytes(loanID_1))
             expect(data.coach).to.equal(accounts[6].address);
             expect(data.sponsor).to.equal(accounts[7].address);
-            expect(data.teacher).to.equal(accounts[8].address);
             expect(data.nftAddress).to.equal(courseNFT.address);
             expect(data.tokenId).to.equal(0);
 
@@ -67,8 +63,7 @@ describe("NFT Factory Test", function () {
                 ethers.utils.toUtf8Bytes(loanID_1),
                 accounts[5].address, 
                 accounts[10].address, 
-                accounts[11].address, 
-                accounts[12].address, 
+                accounts[11].address,
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -78,7 +73,6 @@ describe("NFT Factory Test", function () {
             const data2 = await TalenMatch.matchRegistry(ethers.utils.toUtf8Bytes(loanID_1))
             expect(data2.coach).to.equal(accounts[10].address);
             expect(data2.sponsor).to.equal(accounts[11].address);
-            expect(data2.teacher).to.equal(accounts[12].address);
             expect(data2.nftAddress).to.equal(courseNFT.address);
             expect(data2.tokenId).to.equal(0);
 
@@ -87,8 +81,7 @@ describe("NFT Factory Test", function () {
                     ethers.utils.toUtf8Bytes(loanID_2),
                     accounts[6].address, 
                     accounts[10].address, 
-                    accounts[11].address, 
-                    accounts[12].address, 
+                    accounts[11].address,
                     courseNFT.address, 
                     1, 
                     ethers.utils.parseEther("100"), 
@@ -105,8 +98,7 @@ describe("NFT Factory Test", function () {
                 ethers.utils.toUtf8Bytes(loanID_1),
                 accounts[5].address, 
                 accounts[6].address, 
-                accounts[7].address, 
-                accounts[8].address, 
+                accounts[7].address,
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -116,7 +108,6 @@ describe("NFT Factory Test", function () {
             const data = await TalenMatch.matchRegistry(ethers.utils.toUtf8Bytes(loanID_1))
             expect(data.coach).to.equal(accounts[6].address);
             expect(data.sponsor).to.equal(accounts[7].address);
-            expect(data.teacher).to.equal(accounts[8].address);
             expect(data.nftAddress).to.equal(courseNFT.address);
             expect(data.tokenId).to.equal(0);
 
@@ -124,7 +115,6 @@ describe("NFT Factory Test", function () {
             const data2 = await TalenMatch.matchRegistry(ethers.utils.toUtf8Bytes(loanID_1))
             expect(data2.coach).to.equal(ethers.constants.AddressZero);
             expect(data2.sponsor).to.equal(ethers.constants.AddressZero);
-            expect(data2.teacher).to.equal(ethers.constants.AddressZero);
             expect(data2.nftAddress).to.equal(ethers.constants.AddressZero);
             expect(data2.tokenId).to.equal(0);
 
@@ -140,7 +130,6 @@ describe("NFT Factory Test", function () {
                 accounts[5].address, 
                 accounts[6].address, 
                 accounts[7].address, 
-                accounts[8].address, 
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -175,7 +164,6 @@ describe("NFT Factory Test", function () {
             const data2 = await TalenMatch.matchRegistry(ethers.utils.toUtf8Bytes(loanID_1))
             expect(data2.coach).to.equal(ethers.constants.AddressZero);
             expect(data2.sponsor).to.equal(ethers.constants.AddressZero);
-            expect(data2.teacher).to.equal(ethers.constants.AddressZero);
             expect(data2.nftAddress).to.equal(ethers.constants.AddressZero);
             expect(data2.tokenId).to.equal(0);
 
@@ -202,8 +190,7 @@ describe("NFT Factory Test", function () {
                 ethers.utils.toUtf8Bytes(loanID_1),
                 accounts[5].address, 
                 accounts[6].address, 
-                accounts[7].address, 
-                accounts[8].address, 
+                accounts[7].address,
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -249,7 +236,6 @@ describe("NFT Factory Test", function () {
                 accounts[7].address, // talent same as sponsor
                 accounts[6].address, 
                 accounts[7].address, // talent same as sponsor
-                accounts[8].address, 
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -282,7 +268,6 @@ describe("NFT Factory Test", function () {
                 accounts[5].address,
                 ethers.constants.AddressZero, 
                 accounts[7].address,
-                accounts[8].address, 
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -313,7 +298,6 @@ describe("NFT Factory Test", function () {
                 accounts[7].address, // talent same as sponsor
                 ethers.constants.AddressZero, 
                 accounts[7].address, // talent same as sponsor
-                accounts[8].address, 
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -339,7 +323,6 @@ describe("NFT Factory Test", function () {
                 accounts[5].address, 
                 accounts[6].address, 
                 accounts[7].address, 
-                accounts[8].address, 
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -356,7 +339,6 @@ describe("NFT Factory Test", function () {
                     accounts[11].address, 
                     accounts[6].address, 
                     accounts[7].address, 
-                    accounts[8].address, 
                     courseNFT.address, 
                     0, 
                     ethers.utils.parseEther("100"), 
@@ -370,7 +352,6 @@ describe("NFT Factory Test", function () {
                     accounts[5].address, 
                     accounts[10].address, 
                     accounts[11].address, 
-                    accounts[12].address, 
                     courseNFT.address, 
                     0, 
                     ethers.utils.parseEther("100"),
@@ -404,7 +385,6 @@ describe("NFT Factory Test", function () {
                     accounts[5].address, 
                     accounts[6].address, 
                     accounts[7].address, 
-                    accounts[8].address, 
                     courseNFT.address, 
                     0, 
                     ethers.utils.parseEther("100"), 
@@ -420,8 +400,7 @@ describe("NFT Factory Test", function () {
                 ethers.utils.toUtf8Bytes(loanID_1),
                 accounts[5].address, 
                 accounts[6].address, 
-                accounts[7].address, 
-                accounts[8].address, 
+                accounts[7].address,
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -433,8 +412,7 @@ describe("NFT Factory Test", function () {
                     ethers.utils.toUtf8Bytes(loanID_1),
                     accounts[5].address, 
                     accounts[6].address, 
-                    accounts[10].address, 
-                    accounts[8].address, 
+                    accounts[10].address,
                     courseNFT.address, 
                     0, 
                     ethers.utils.parseEther("100"), 
@@ -450,8 +428,7 @@ describe("NFT Factory Test", function () {
                 ethers.utils.toUtf8Bytes(loanID_1),
                 accounts[5].address, 
                 accounts[6].address, 
-                accounts[7].address, 
-                accounts[8].address, 
+                accounts[7].address,
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
@@ -470,7 +447,6 @@ describe("NFT Factory Test", function () {
                 accounts[5].address, 
                 accounts[6].address, 
                 accounts[7].address, 
-                accounts[8].address, 
                 courseNFT.address, 
                 0, 
                 ethers.utils.parseEther("100"), 
