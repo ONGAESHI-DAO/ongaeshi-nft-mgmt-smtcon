@@ -9,6 +9,9 @@ import "./Interface/ICourseToken.sol";
 import "./Interface/ICourseTokenEvent.sol";
 import "./OGSLib.sol";
 
+/// @title ONGAESHI Education NFT Marketplace Smart Contract
+/// @author xWin Finance
+/// @notice This contract serves as a simple listing based NFT marketplace for ONGAESHI Education NFTs
 contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
@@ -53,6 +56,11 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         uint256 price
     );
 
+    /// Initializer function for ONGAESHI NFT Marketplace.
+    /// @param _gtAddress ONGAESHI Token address.
+    /// @param _treasury Treasury wallet address.
+    /// @param _treasuryCommission Treasury commission fee percentage, e.g. 500 = 5%.
+    /// @param _teacherCommission Teacher commission fee percentage, e.g. 1200 = 12%.
     function initialize(
         address _gtAddress,
         address _treasury,
@@ -78,15 +86,20 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         admins[msg.sender] = true;
     }
 
+    /// Create an NFT sale listing on
+    /// @param _tokenAddress ONGAESHI Education NFT Address.
+    /// @param _tokenId ID of NFT to be listed.
+    /// @param _amount Listing price of NFT in ONGAESHI Tokens.
+    /** @dev NFT must not be currently lended out to a talent.
+     * The NFT cannot be listed if it needs to be repaired.
+     * The caller wallet must be the owner of the NFT.
+     * This contract will hold ownership of the NFT while the listing is active.
+     */
     function createListing(
         address _tokenAddress,
         uint256 _tokenId,
         uint256 _amount
     ) external {
-        // check not lended out
-        // check no need repair
-        // xfer nft to this contract
-        // write listing into storage
         require(
             ICourseToken(_tokenAddress).isLended(_tokenId) == address(0),
             "Token is on loan"
@@ -111,10 +124,11 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         emit ListingCreated(_tokenAddress, _tokenId, msg.sender, _amount);
     }
 
+    /// @notice Cancels an active listing and returns NFT to owner.
+    /// @param _tokenAddress ONGAESHI Education NFT Address.
+    /// @param _tokenId ID of NFT listing to remove.
+    /// @dev Caller must the listing creator.
     function cancelListing(address _tokenAddress, uint256 _tokenId) external {
-        // check msg sender is lister
-        // remove listing
-        // return nft
         Listing memory toBeRemovedListing = listingMap[_tokenAddress][_tokenId];
         require(
             msg.sender == toBeRemovedListing.nftOwner,
@@ -134,6 +148,10 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         emit ListingDeleted(_tokenAddress, _tokenId);
     }
 
+    /// @notice Updates the price of an existing listing, caller must be original listing creator.
+    /// @param _tokenAddress ONGAESHI Education NFT Address.
+    /// @param _tokenId ID of NFT listing to update.
+    /// @param _amount New price of NFT listing.
     function updateListing(
         address _tokenAddress,
         uint256 _tokenId,
@@ -157,6 +175,12 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         );
     }
 
+    /// @notice Purchases a NFT from a listing. Caller must have sufficient ONGAESHI Tokens and approved this contract for spending.
+    /// @param _tokenAddress ONGAESHI Education NFT Address.
+    /// @param _tokenId ID of NFT listing to purchase.
+    /** @dev NFT will be transferred to the caller.
+     * ONGAESHI Tokens will be paid to the listing creator, treasury and teachers specified in the NFT smart contract.
+     */
     function buyListing(address _tokenAddress, uint256 _tokenId) external {
         // collect GT | pay nft owner | pay teachers | pay treasury | transfer nft
 
@@ -193,7 +217,6 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         );
         transferCourseToken(_tokenAddress, address(this), msg.sender, _tokenId);
 
-
         emit ListingPurchased(
             _tokenAddress,
             _tokenId,
@@ -202,15 +225,21 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         );
     }
 
+    /// @notice Updates the ONGAESHI token address of this smart contract. Caller must be admin.
+    /// @param _gtAddress New ONGAESHI token address.
     function setGTAddress(address _gtAddress) external onlyAdmin {
         gtAddress = _gtAddress;
     }
 
+    /// @notice Updates recipient address of treasury commission fees. Caller must be admin.
+    /// @param _newTreasury New address of treasury.
     function setTreasury(address _newTreasury) external onlyAdmin {
         require(_newTreasury != address(0), "newTreasury address 0");
         treasury = _newTreasury;
     }
 
+    /// @notice Updates new treasury commission fee percentage.Caller must be admin.
+    /// @param _newTreasuryCommission New treasury commission fee.
     function setTreasuryCommission(
         uint256 _newTreasuryCommission
     ) external onlyAdmin {
@@ -221,6 +250,8 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         treasuryCommission = _newTreasuryCommission;
     }
 
+    /// @notice Updates new teacher commission fee percentage. Caller must be admin.
+    /// @param _newTeacherCommission New teacher commission fee.
     function setTeacherCommission(
         uint256 _newTeacherCommission
     ) external onlyAdmin {
@@ -257,6 +288,9 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         return listings.length;
     }
 
+    /// @notice Set admin status to any wallet, caller must be contract owner.
+    /// @param _address Address to set admin status.
+    /// @param _allow Admin status, true to give admin access, false to revoke.
     function setAdmin(address _address, bool _allow) external onlyOwner {
         admins[_address] = _allow;
     }

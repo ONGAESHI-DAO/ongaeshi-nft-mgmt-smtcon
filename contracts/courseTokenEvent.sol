@@ -6,6 +6,9 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./OGSLib.sol";
 
+/// @title Event emitter Contract
+/// @author xWin Finance
+/// @notice Emits all Events for ONGAESHI DAO for NFT mint, loan, repair, talent match and contract parameter updates.
 contract CourseTokenEvent is OwnableUpgradeable {
     modifier onlyExecutor() {
         require(executors[msg.sender], "executor: wut?");
@@ -236,7 +239,9 @@ contract CourseTokenEvent is OwnableUpgradeable {
         emit TokenLended(_courseAddress, _tokenId, _Id);
     }
 
-    // Support multiple wallets or address as admin
+    /// @notice Set executor status to any contract, caller must be an Executor
+    /// @param _address Address to set executor status
+    /// @param _allow Executor status, true to give access, false to revoke
     function setExecutor(address _address, bool _allow) external onlyExecutor {
         executors[_address] = _allow;
     }

@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('@openzeppelin/hardhat-upgrades');
+require("solidity-docgen");
 const { privateKey, alchemyPolygonNode} = require('./secrets.json');
 
 let RPCNode = alchemyPolygonNode;
@@ -41,5 +42,8 @@ module.exports = {
     token: 'MATIC',
     gasPrice: 137,
     // coinmarketcap: "API KEY"
+  },
+  docgen: {
+    pages: 'files'
   }
 };
