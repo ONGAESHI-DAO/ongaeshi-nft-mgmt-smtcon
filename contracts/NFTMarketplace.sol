@@ -88,13 +88,14 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         // xfer nft to this contract
         // write listing into storage
         require(
-            ICourseToken(_tokenAddress).isLended(_tokenId) == address(0),
-            "Token is on loan"
+            ICourseToken(_tokenAddress).isLended(_tokenId) == bytes20(0),
+            "Token is on loan, listing is not permitted"
         );
         require(
             ICourseToken(_tokenAddress).repairCost(_tokenId) == 0,
-            "Token needs repair"
+            "Token needs repair, listing is not permitted"
         );
+        require(_amount > 0, "Listing price must not be zero");
 
         transferCourseToken(_tokenAddress, msg.sender, address(this), _tokenId);
 

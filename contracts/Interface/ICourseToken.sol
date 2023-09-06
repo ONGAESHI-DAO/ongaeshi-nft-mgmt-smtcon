@@ -13,7 +13,7 @@ interface ICourseToken {
 
     function addTeacherShares(TeacherShare[] calldata _teacherShares) external;
 
-    function isLended(uint256 _tokenId) external returns (address);
+    function isLended(uint256 _tokenId) external returns (bytes20);
 
     function repairCost(uint256 _tokenId) external returns (uint256);
 
