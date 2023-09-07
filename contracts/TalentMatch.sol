@@ -90,7 +90,6 @@ contract TalentMatch is OwnableUpgradeable {
     /// @param _talent Talent wallet address, may be empty if talent wallet is unavailable.
     /// @param _coach Coach wallet address to receive coach share reward, may be empty if talent did not have a coach.
     /// @param _sponsor Sponsor wallet to receive sponsor share reward.
-    /// @param _teacher Teacher wallet address
     /// @param _nftAddress Address of ONGAESHI Education NFT loaned and returned to talent.
     /// @param _tokenId NFT ID.
     /// @param _amount Talent matching payment reward amount.
@@ -130,7 +129,6 @@ contract TalentMatch is OwnableUpgradeable {
     /// @param _talent Talent wallet address, may be empty if talent wallet is unavailable.
     /// @param _coach Coach wallet address to receive coach share reward, may be empty if talent did not have a coach.
     /// @param _sponsor Sponsor wallet to receive sponsor share reward.
-    /// @param _teacher Teacher wallet address
     /// @param _nftAddress Address of ONGAESHI Education NFT loaned and returned to talent.
     /// @param _tokenId NFT ID.
     /// @param _amount Talent matching payment reward amount.
