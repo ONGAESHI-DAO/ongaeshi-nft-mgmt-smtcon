@@ -47,6 +47,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         string calldata _name,
         string calldata _symbol,
@@ -93,7 +98,10 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         uint256 sum;
         delete teacherShares;
         for (uint256 i = 0; i < _teacherShares.length; i++) {
-            require(_teacherShares[i].teacher != address(0), "Input teacher address zero");
+            require(
+                _teacherShares[i].teacher != address(0),
+                "Input teacher address zero"
+            );
             teacherShares.push(_teacherShares[i]);
             sum += _teacherShares[i].shares;
         }

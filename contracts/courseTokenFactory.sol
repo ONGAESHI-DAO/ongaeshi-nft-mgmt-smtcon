@@ -21,6 +21,11 @@ contract CourseTokenFactory is OwnableUpgradeable {
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     /// @notice Initializer function for deploying CourseTokenFactory contract.
     /// @param _beaconAddress Beacon implementation of CourseToken: ONGAESHI Education NFT.
     /// @param _tokenAddr ONGAESHI Token Contract Address.
