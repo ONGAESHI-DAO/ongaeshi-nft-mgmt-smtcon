@@ -11,7 +11,6 @@ library OGSLib {
         address talent;
         address coach;
         address sponsor;
-        address teacher;
         address nftAddress;
         uint256 tokenId;
         uint256 amount;

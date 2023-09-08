@@ -89,7 +89,7 @@ Share total must be 10000, which represents 100%._
 ### addTalentMatch
 
 ```solidity
-function addTalentMatch(bytes20 _Id, address _talent, address _coach, address _sponsor, address _teacher, address _nftAddress, uint256 _tokenId, uint256 _amount, uint256 _matchDate, uint256 _payDate) external
+function addTalentMatch(bytes20 _Id, address _talent, address _coach, address _sponsor, address _nftAddress, uint256 _tokenId, uint256 _amount, uint256 _matchDate, uint256 _payDate) external
 ```
 
 Adds a new talent match record into the smart contract, caller must be admin wallet.
@@ -102,7 +102,6 @@ Adds a new talent match record into the smart contract, caller must be admin wal
 | _talent | address | Talent wallet address, may be empty if talent wallet is unavailable. |
 | _coach | address | Coach wallet address to receive coach share reward, may be empty if talent did not have a coach. |
 | _sponsor | address | Sponsor wallet to receive sponsor share reward. |
-| _teacher | address | Teacher wallet address |
 | _nftAddress | address | Address of ONGAESHI Education NFT loaned and returned to talent. |
 | _tokenId | uint256 | NFT ID. |
 | _amount | uint256 | Talent matching payment reward amount. |
@@ -112,7 +111,7 @@ Adds a new talent match record into the smart contract, caller must be admin wal
 ### updateTalentMatch
 
 ```solidity
-function updateTalentMatch(bytes20 _Id, address _talent, address _coach, address _sponsor, address _teacher, address _nftAddress, uint256 _tokenId, uint256 _amount, uint256 _matchDate, uint256 _payDate) external
+function updateTalentMatch(bytes20 _Id, address _talent, address _coach, address _sponsor, address _nftAddress, uint256 _tokenId, uint256 _amount, uint256 _matchDate, uint256 _payDate) external
 ```
 
 Updates existing talent match record, caller must be admin wallet.
@@ -125,7 +124,6 @@ Updates existing talent match record, caller must be admin wallet.
 | _talent | address | Talent wallet address, may be empty if talent wallet is unavailable. |
 | _coach | address | Coach wallet address to receive coach share reward, may be empty if talent did not have a coach. |
 | _sponsor | address | Sponsor wallet to receive sponsor share reward. |
-| _teacher | address | Teacher wallet address |
 | _nftAddress | address | Address of ONGAESHI Education NFT loaned and returned to talent. |
 | _tokenId | uint256 | NFT ID. |
 | _amount | uint256 | Talent matching payment reward amount. |
