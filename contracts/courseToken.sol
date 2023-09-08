@@ -91,6 +91,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             "Cannot update Teachershares after NFT minted"
         );
         uint256 sum;
+        delete teacherShares;
         for (uint256 i = 0; i < _teacherShares.length; i++) {
             teacherShares.push(_teacherShares[i]);
             sum += _teacherShares[i].shares;
