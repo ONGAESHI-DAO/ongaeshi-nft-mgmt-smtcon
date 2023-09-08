@@ -58,7 +58,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         address _tokenAddr,
         address _emitEventAddr
     ) external initializer {
-        require(_treasury != address(0), "_teacher is zero");
+        require(_treasury != address(0), "_treasury is zero");
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         require(_supplyLimit > 0, "_supplyLimit is zero");
         __Ownable_init();
@@ -93,6 +93,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         uint256 sum;
         delete teacherShares;
         for (uint256 i = 0; i < _teacherShares.length; i++) {
+            require(_teacherShares[i].teacher != address(0), "Input teacher address zero");
             teacherShares.push(_teacherShares[i]);
             sum += _teacherShares[i].shares;
         }
