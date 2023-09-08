@@ -268,6 +268,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         require(!adminRepairOnly, "Can only be repaired by admin");
         require(gtAddress != address(0), "GT not available");
         delete repairCost[_tokenId];
+        delete needRepairMap[_tokenId];
 
         uint256 treasuryCut = (nftRepairCost * treasuryFee) / 10000;
         IERC20Upgradeable(gtAddress).safeTransferFrom(
