@@ -47,6 +47,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         string calldata _name,
         string calldata _symbol,
@@ -58,9 +63,11 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         address _tokenAddr,
         address _emitEventAddr
     ) external initializer {
-        require(_treasury != address(0), "_teacher is zero");
+        require(_treasury != address(0), "_treasury is zero");
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         require(_supplyLimit > 0, "_supplyLimit is zero");
+        require(_price > 0, "_price is zero");
+        require(_treasuryFee <= 10000, "_tresuryFee cannot exceed 100%");
         __Ownable_init();
         __ERC721_init(_name, _symbol);
         baseURI = _tokenBaseURI;
@@ -91,7 +98,12 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
             "Cannot update Teachershares after NFT minted"
         );
         uint256 sum;
+        delete teacherShares;
         for (uint256 i = 0; i < _teacherShares.length; i++) {
+            require(
+                _teacherShares[i].teacher != address(0),
+                "Input teacher address zero"
+            );
             teacherShares.push(_teacherShares[i]);
             sum += _teacherShares[i].shares;
         }
@@ -159,6 +171,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     /// @notice Update minting price of NFT, caller must be admin wallet.
     /// @param _newPrice New minting price of NFT.
     function setPrice(uint256 _newPrice) external onlyAdmin {
+        require(_newPrice > 0, "_newPrice is zero");
         xEmitEvent.PriceUpdatedEvent(address(this), price, _newPrice);
         price = _newPrice;
     }
@@ -182,6 +195,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     /// @notice Increase the NFT supply limit by input number. Caller must be admin.
     /// @param _increaseBy number to increase supply limit by, e.g supplyLimit 100, increaseBy 5, new supplyLimit = 105.
     function increaseSupplyLimit(uint256 _increaseBy) external onlyAdmin {
+        require(_increaseBy > 0, "_increaseBy is zero");
         uint256 newSupply = supplyLimit + _increaseBy;
         xEmitEvent.SupplyLimitUpdatedEvent(
             address(this),
@@ -194,6 +208,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     /// @notice Decrease the NFT supply limit by input number. Caller must be admin.
     /// @param _decreaseBy number to decrease supply limit by, e.g supplyLimit 100, increaseBy 5, new supplyLimit = 95.
     function decreaseSupplyLimit(uint256 _decreaseBy) external onlyAdmin {
+        require(_decreaseBy > 0, "_decreaseBy is zero");
         require(supplyLimit >= _decreaseBy, "Input greater than supplyLimit");
         require(
             supplyLimit - _decreaseBy >= currentSupply,
@@ -213,6 +228,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     /// @param _tokenId Token to loan out.
     /// @param _Id Talent UUID to that is borring the token.
     function lendToken(uint256 _tokenId, bytes20 _Id) external onlyAdmin {
+        require(_Id != 0, "_Id is zero");
         require(_exists(_tokenId), "Token does not exists");
         require(isLended[_tokenId] == 0, "Token already lended");
         require(repairCost[_tokenId] == 0, "Token needs repair");
@@ -268,6 +284,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         require(!adminRepairOnly, "Can only be repaired by admin");
         require(gtAddress != address(0), "GT not available");
         delete repairCost[_tokenId];
+        delete needRepairMap[_tokenId];
 
         uint256 treasuryCut = (nftRepairCost * treasuryFee) / 10000;
         IERC20Upgradeable(gtAddress).safeTransferFrom(

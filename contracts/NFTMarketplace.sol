@@ -56,6 +56,11 @@ contract NFTMarketplace is OwnableUpgradeable, IERC721ReceiverUpgradeable {
         uint256 price
     );
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     /// Initializer function for ONGAESHI NFT Marketplace.
     /// @param _gtAddress ONGAESHI Token address.
     /// @param _treasury Treasury wallet address.

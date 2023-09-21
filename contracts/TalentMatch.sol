@@ -28,6 +28,11 @@ contract TalentMatch is OwnableUpgradeable {
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     /// @notice Initializer function for contract deployment.
     /// @param _tokenAddr ONGAESHI Token Address.
     /// @param _coachShare Percentage share for the coach.

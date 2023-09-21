@@ -93,6 +93,11 @@ contract CourseTokenEvent is OwnableUpgradeable {
         bytes20 loanId
     );
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize() external initializer {
         __Ownable_init();
         executors[msg.sender] = true;
