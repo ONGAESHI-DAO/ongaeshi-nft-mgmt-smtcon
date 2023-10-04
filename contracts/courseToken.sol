@@ -67,7 +67,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
         require(_emitEventAddr != address(0), "_emitEventAddr is zero");
         require(_supplyLimit > 0, "_supplyLimit is zero");
         require(_price > 0, "_price is zero");
-        require(_treasuryFee <= 10000, "_tresuryFee cannot exceed 100%");
+        require(_treasuryFee <= 9900, "_tresuryFee cannot exceed 99%");
         __Ownable_init();
         __ERC721_init(_name, _symbol);
         baseURI = _tokenBaseURI;
@@ -180,7 +180,7 @@ contract CourseToken is ERC721Upgradeable, OwnableUpgradeable {
     /// @notice Updates treasury fee, caller must be admin wallet.
     /// @param _treasuryFee New treasury fee, e.g. 500 = 5%, 1000 = 10%.
     function setTreasuryFee(uint256 _treasuryFee) external onlyAdmin {
-        require(_treasuryFee <= 10000, "treasury fee cannot exceed 100%");
+        require(_treasuryFee <= 9900, "treasury fee cannot exceed 100%");
         xEmitEvent.FeeUpdatedEvent(address(this), treasuryFee, _treasuryFee);
         treasuryFee = _treasuryFee;
     }
