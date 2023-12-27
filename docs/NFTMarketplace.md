@@ -88,6 +88,12 @@ event ListingDeleted(address courseAddress, uint256 tokenId)
 event ListingPurchased(address courseAddress, uint256 tokenId, address buyer, uint256 price)
 ```
 
+### constructor
+
+```solidity
+constructor() public
+```
+
 ### initialize
 
 ```solidity

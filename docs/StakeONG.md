@@ -39,7 +39,7 @@ uint32 MAX_INCENTIVE
 ### userStakePosition
 
 ```solidity
-mapping(address => mapping(uint32 => struct StakeONG.DepositData)) userStakePosition
+mapping(address => mapping(uint32 => struct StakeONG.DepositData[])) userStakePosition
 ```
 
 ### userList
@@ -111,7 +111,7 @@ Caller must not have an existing stake in the same incentive_
 ### withdraw
 
 ```solidity
-function withdraw(uint32 _incentive) external
+function withdraw(uint32 _incentive, uint256 _index) external
 ```
 
 Withdraws ONGAESHI Tokens after stake duration has ended
@@ -123,11 +123,18 @@ _Block timestamp must be greater than user's stake releaseTimestamp_
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _incentive | uint32 | Incentive type to withdraw from |
+| _index | uint256 | Index of user's staking array to withdraw |
 
 ### deleteUserFromArray
 
 ```solidity
 function deleteUserFromArray(address _user, uint32 _incentive) internal
+```
+
+### deleteUserStakePosition
+
+```solidity
+function deleteUserStakePosition(address _user, uint32 _incentive, uint256 _index) internal
 ```
 
 ### setMaxIncentive
@@ -179,10 +186,16 @@ Gets all stake wallet addresses for the input incentive
 | ---- | ---- | ----------- |
 | _incentive | uint32 | incentive type |
 
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | address[] | Array of all staked wallets |
+
 ### getUserPosition
 
 ```solidity
-function getUserPosition(address _user, uint32 _incentive) external view returns (struct StakeONG.DepositData)
+function getUserPosition(address _user, uint32 _incentive) external view returns (struct StakeONG.DepositData[])
 ```
 
 Gets a user's staking position in a given incentive
@@ -193,6 +206,12 @@ Gets a user's staking position in a given incentive
 | ---- | ---- | ----------- |
 | _user | address | Wallet address of user |
 | _incentive | uint32 | incentive type |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | struct StakeONG.DepositData[] | Array of all stake by the input wallet and incentive |
 
 ### setAdmin
 

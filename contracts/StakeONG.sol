@@ -19,7 +19,8 @@ contract StakeONG is OwnableUpgradeable {
     uint256 public MIN_DEPOSIT_DURATION;
     uint256 public MAX_DEPOSIT_DURATION;
     uint32 public MAX_INCENTIVE;
-    mapping(address => mapping(uint32 => DepositData)) public userStakePosition;
+    mapping(address => mapping(uint32 => DepositData[]))
+        public userStakePosition;
     mapping(uint32 => address[]) public userList;
     mapping(uint32 => uint256) public totalDeposits;
     mapping(address => bool) public admins;
@@ -77,10 +78,7 @@ contract StakeONG is OwnableUpgradeable {
         );
         require(_duration <= MAX_DEPOSIT_DURATION, "Exceed maximum duration");
         require(_incentive <= MAX_INCENTIVE, "Invalid incentive input");
-        require(
-            userStakePosition[msg.sender][_incentive].amount == 0,
-            "Already have staking position"
-        );
+
         IERC20Upgradeable(gtAddress).safeTransferFrom(
             msg.sender,
             address(this),
@@ -90,8 +88,11 @@ contract StakeONG is OwnableUpgradeable {
         newPosition.amount = _amount;
         newPosition.depositDuration = _duration;
         newPosition.releaseTimestamp = block.timestamp + _duration;
-        userStakePosition[msg.sender][_incentive] = newPosition;
-        userList[_incentive].push(msg.sender);
+        userStakePosition[msg.sender][_incentive].push(newPosition);
+
+        if (userStakePosition[msg.sender][_incentive].length == 1) {
+            userList[_incentive].push(msg.sender);
+        }
         totalDeposits[_incentive] += _amount;
         //emit event
         emit StakedToken(
@@ -104,21 +105,32 @@ contract StakeONG is OwnableUpgradeable {
 
     /// Withdraws ONGAESHI Tokens after stake duration has ended
     /// @param _incentive Incentive type to withdraw from
+    /// @param _index Index of user's staking array to withdraw
     /// @dev Block timestamp must be greater than user's stake releaseTimestamp
-    function withdraw(uint32 _incentive) external {
-        DepositData memory data = userStakePosition[msg.sender][_incentive];
-        require(data.amount > 0, "No Stake detected on this incentive");
+    function withdraw(uint32 _incentive, uint256 _index) external {
+        DepositData memory data = userStakePosition[msg.sender][_incentive][
+            _index
+        ];
+        require(
+            userStakePosition[msg.sender][_incentive].length > 0,
+            "User has no recorded stake"
+        );
+        require(
+            _index < userStakePosition[msg.sender][_incentive].length,
+            "invalid index"
+        );
         require(
             data.releaseTimestamp < block.timestamp,
             "Stake duration still ongoing"
         );
-        delete userStakePosition[msg.sender][_incentive];
-        deleteUserFromArray(msg.sender, _incentive);
+        deleteUserStakePosition(msg.sender, _incentive, _index);
+
+        if (userStakePosition[msg.sender][_incentive].length == 0) {
+            deleteUserFromArray(msg.sender, _incentive);
+        }
+
         totalDeposits[_incentive] -= data.amount;
-        IERC20Upgradeable(gtAddress).safeTransfer(
-            msg.sender,
-            data.amount
-        );
+        IERC20Upgradeable(gtAddress).safeTransfer(msg.sender, data.amount);
 
         emit WithdrawToken(
             msg.sender,
@@ -139,6 +151,16 @@ contract StakeONG is OwnableUpgradeable {
             }
         }
         require(false, "Error: User with stake position, but not in user list");
+    }
+
+    function deleteUserStakePosition(
+        address _user,
+        uint32 _incentive,
+        uint256 _index
+    ) internal {
+        DepositData[] storage arr = userStakePosition[_user][_incentive];
+        arr[_index] = arr[arr.length - 1];
+        arr.pop();
     }
 
     function setMaxIncentive(uint32 _newMaxIncentive) external onlyAdmin {
@@ -166,6 +188,7 @@ contract StakeONG is OwnableUpgradeable {
 
     /// Gets all stake wallet addresses for the input incentive
     /// @param _incentive incentive type
+    /// @return Array of all staked wallets
     function getAllUser(
         uint32 _incentive
     ) external view returns (address[] memory) {
@@ -175,10 +198,11 @@ contract StakeONG is OwnableUpgradeable {
     /// Gets a user's staking position in a given incentive
     /// @param _user Wallet address of user
     /// @param _incentive incentive type
+    /// @return Array of all stake by the input wallet and incentive
     function getUserPosition(
         address _user,
         uint32 _incentive
-    ) external view returns (DepositData memory) {
+    ) external view returns (DepositData[] memory) {
         return userStakePosition[_user][_incentive];
     }
 
