@@ -4,7 +4,7 @@ require("solidity-docgen");
 const { privateKey, alchemyPolygonNode} = require('./secrets.json');
 
 let RPCNode = alchemyPolygonNode;
-let blockNum = 49751483;
+let blockNum = 50167500;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -12,6 +12,7 @@ module.exports = {
     localhost: {
       chainId: 31337,
       url: "http://127.0.0.1:8545",
+      accounts: [privateKey]
     },
     // hardhat: {
     //   forking: {
