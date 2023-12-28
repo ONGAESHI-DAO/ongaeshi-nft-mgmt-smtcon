@@ -108,6 +108,12 @@ modifier onlyAdmin()
 modifier onlyEnabled()
 ```
 
+### constructor
+
+```solidity
+constructor() public
+```
+
 ### initialize
 
 ```solidity

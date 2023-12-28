@@ -40,6 +40,12 @@ contract ICourseTokenEvent xEmitEvent
 modifier onlyAdmin()
 ```
 
+### constructor
+
+```solidity
+constructor() public
+```
+
 ### initialize
 
 ```solidity

@@ -112,6 +112,12 @@ event Repaired(address courseAddress, uint256 tokenId)
 event TokenLended(address courseAddress, uint256 tokenId, bytes20 loanId)
 ```
 
+### constructor
+
+```solidity
+constructor() public
+```
+
 ### initialize
 
 ```solidity
