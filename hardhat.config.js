@@ -20,9 +20,9 @@ module.exports = {
       }
     },
     testnet: {
-      url: "https://rpc-mumbai.maticvigil.com/",
-      chainId: 80001,
-      gasPrice: 2000000000,
+      url: "https://rpc-amoy.polygon.technology/",
+      chainId: 80002,
+      gasPrice: 30000000000,
       accounts: [privateKey]
     },
     mainnet: {
