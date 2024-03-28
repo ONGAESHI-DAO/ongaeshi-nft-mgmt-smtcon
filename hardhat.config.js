@@ -4,7 +4,7 @@ require("solidity-docgen");
 const { privateKey, alchemyPolygonNode} = require('./secrets.json');
 
 let RPCNode = alchemyPolygonNode;
-let blockNum = 50167500;
+let blockNum = 52740049;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -14,16 +14,16 @@ module.exports = {
       url: "http://127.0.0.1:8545",
       accounts: [privateKey]
     },
-    // hardhat: {
-    //   forking: {
-    //     url: RPCNode,
-    //     blockNumber: blockNum
-    //   }
-    // },
+    hardhat: {
+      forking: {
+        url: RPCNode,
+        blockNumber: blockNum
+      }
+    },
     testnet: {
-      url: "https://rpc-mumbai.maticvigil.com/",
-      chainId: 80001,
-      gasPrice: 2000000000,
+      url: "https://rpc-amoy.polygon.technology/",
+      chainId: 80002,
+      gasPrice: 30000000000,
       accounts: [privateKey]
     },
     mainnet: {
