@@ -2,9 +2,9 @@ const hre = require("hardhat");
 
 async function burnToken(nftAddress, nftOwner, tokenId) {
     
-    const burnAddress = "0x000000000000000000000000000000000000dEaD"
+    const poolAddress = "0x4B74ED653dd03492401d873eaA61c92247F0E26A"
     const contract = await hre.ethers.getContractAt("CourseToken", nftAddress);
-    let txn = await contract.adminTransferFrom(nftOwner, burnAddress, tokenId);
+    let txn = await contract.adminTransferFrom(nftOwner, poolAddress, tokenId);
     await txn.wait();
     console.log("Token id: ", tokenId, " burned");
     // check after burned
